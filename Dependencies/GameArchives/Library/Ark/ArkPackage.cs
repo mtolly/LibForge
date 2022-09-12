@@ -389,6 +389,8 @@ namespace GameArchives.Ark
       }
 
       var numFiles2 = header.ReadUInt32LE();
+      if(numFiles != numFiles2)
+        throw new Exception("Ark header appears invalid (file count mismatch)");
       for(var i = 0; i < numFiles2; i++)
       {
         files[i].ExtendedInfo["flags2"] = header.ReadInt32LE();
