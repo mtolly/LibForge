@@ -1,18 +1,12 @@
 # About This Repository
 
-I am keeping track of my research into RB4 customs here.
+This is a revival of LibForge, in order to renew the code and also make it compatible with Amplitude 2016.
 
-I am working out the structure of the files in Rock Band 4. These are being documented in the form of 010 Editor Template files, which are in the `010` directory.
+# How to Build
 
-# Latest Build
+You need: .NET 6 | .NET Core 3.1
 
-Can be downloaded at [Appveyor](https://ci.appveyor.com/project/maxton/libforge/branch/master/artifacts)
-
-# LibForge
-
-This is a library I'm working on that handles reading, writing, and converting for formats in the Forge engine used by Rock Band 4 and Rock Band VR.
-
-It is licensed under the GNU LGPLv3 and includes two frontends at the moment:
+Compile using LibForge.sln, when the compilation is complete, there should be a bin folder inside each program folder. (ForgeTool, ForgeToolGUI, LibForge, LibForgeTests)
 
 ## ForgeTool
 

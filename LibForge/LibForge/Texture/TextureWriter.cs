@@ -13,6 +13,12 @@ namespace LibForge.Texture
     {
       new TextureWriter(s).WriteStream(r);
     }
+    public static void WriteStreamBigEndian(Texture r, Stream s)
+    {
+      TextureWriter Writer = new TextureWriter(s);
+      Writer.BigEndian = true;
+      Writer.WriteStream(r);
+    }
     private TextureWriter(Stream s) : base(s) { }
     public override void WriteStream(Texture r)
     {

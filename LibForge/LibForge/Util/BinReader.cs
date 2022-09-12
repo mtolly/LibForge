@@ -9,6 +9,7 @@ namespace LibForge.Util
 {
   public class BinReader
   {
+    protected bool BigEndian = false;
     protected Stream s;
     public BinReader(Stream stream)
     {
@@ -102,20 +103,20 @@ namespace LibForge.Util
     // For skipping unknown data
     public Action Skip(int count) => () => s.Position += count;
     // For reading simple types
-    public int Int() => s.ReadInt32LE();
-    public uint UInt() => s.ReadUInt32LE();
-    public long Long() => s.ReadInt64LE();
-    public ulong ULong() => s.ReadUInt64LE();
+    public int Int() => BigEndian ? s.ReadInt32BE() : s.ReadInt32LE();
+    public uint UInt() => BigEndian ? s.ReadUInt32BE() : s.ReadUInt32LE();
+    public long Long() => BigEndian ? s.ReadInt64BE() : s.ReadInt64LE();
+    public ulong ULong() => BigEndian ? s.ReadUInt64BE() : s.ReadUInt64LE();
     public float Half() => s.ReadHalfFloat();
     public float Float() => s.ReadFloat();
-    public short Short() => s.ReadInt16LE();
-    public ushort UShort() => s.ReadUInt16LE();
+    public short Short() => BigEndian ? s.ReadInt16BE() : s.ReadInt16LE();
+    public ushort UShort() => BigEndian ? s.ReadUInt16BE() : s.ReadUInt16LE();
     public byte Byte() => (byte)s.ReadByte();
     public string String() => s.ReadLengthPrefixedString(Encoding.UTF8);
     public string String(int length) => s.ReadFixedLengthNullTerminatedString(length);
     public string FixedString(int length) => s.ReadFixedLengthString(length);
     public string UE4String() => String(Int());
-    public uint UInt24() => s.ReadUInt24LE();
+    public uint UInt24() => BigEndian ? s.ReadUInt24BE() : s.ReadUInt24LE();
     /// <summary>
     /// Reads a byte as a boolean, throwing if it's not 1 or 0
     /// </summary>

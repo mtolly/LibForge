@@ -68,8 +68,6 @@ namespace ForgeToolGUI
       
       if(filename.EndsWith(".pkg"))
       {
-        try
-        {
           string contentId;
           using (var tempS = pkgFile.GetStream())
           {
@@ -80,8 +78,6 @@ namespace ForgeToolGUI
             new string(LibOrbisPkg.Util.Crypto.ComputeKeys(
               contentId, "00000000000000000000000000000000", 1)
               .Select(b => (char)b).ToArray()));
-        }
-        catch (Exception) { }
       }
       else
       {

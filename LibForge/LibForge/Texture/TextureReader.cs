@@ -18,6 +18,27 @@ namespace LibForge.Texture
     public override Texture Read()
     {
       var magic = Int();
+
+      switch (magic)
+      {
+        case 6:
+        case 4:
+          break;
+
+        case 67108864:
+          magic = 4;
+          BigEndian = true;
+          break;
+
+        case 100663296:
+          magic = 6;
+          BigEndian = true;
+          break;
+
+        default:
+          throw new Exception($"Unknown texture magic {magic}");
+      }
+      
       if(magic != 6 && magic != 4)
       {
         throw new Exception($"Unknown texture magic {magic}");

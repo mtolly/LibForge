@@ -83,7 +83,18 @@ namespace LibForge.Extensions
       ret |= tmp[1] & 0x00FF;
       return (short)ret;
     }
+    public static void WriteInt16BE(this Stream s, short i)
+    {
+      s.WriteUInt16BE(unchecked((ushort)i));
+    }
 
+    public static void WriteUInt16BE(this Stream s, ushort i)
+    {
+      byte[] tmp = new byte[2];
+      tmp[1] = (byte)(i & 0xFF);
+      tmp[0] = (byte)((i >> 8) & 0xFF);
+      s.Write(tmp, 0, 2);
+    }
     public static void WriteUInt24LE(this Stream s, uint i)
     {
       byte[] tmp = new byte[3];
@@ -236,6 +247,21 @@ namespace LibForge.Extensions
       return ret;
     }
 
+    public static void WriteInt32BE(this Stream s, int i)
+    {
+      s.WriteUInt32BE(unchecked((uint)i));
+    }
+
+    public static void WriteUInt32BE(this Stream s, uint i)
+    {
+      byte[] tmp = new byte[4];
+      tmp[3] = (byte)(i & 0xFF);
+      tmp[2] = (byte)((i >> 8) & 0xFF);
+      tmp[1] = (byte)((i >> 16) & 0xFF);
+      tmp[0] = (byte)((i >> 24) & 0xFF);
+      s.Write(tmp, 0, 4);
+    }
+
     /// <summary>
     /// Read an unsigned 64-bit little-endian integer from the stream.
     /// </summary>
@@ -312,6 +338,26 @@ namespace LibForge.Extensions
       ret |= (tmp[5] << 16) & 0x00FF0000L;
       ret |= (tmp[4] << 24) & 0xFF000000L;
       return ret;
+    }
+
+    public static void WriteInt64BE(this Stream s, long i)
+    {
+      s.WriteUInt64BE(unchecked((ulong)i));
+    }
+
+    public static void WriteUInt64BE(this Stream s, ulong i)
+    {
+      byte[] tmp = new byte[8];
+      tmp[7] = (byte)(i & 0xFF);
+      tmp[6] = (byte)((i >> 8) & 0xFF);
+      tmp[5] = (byte)((i >> 16) & 0xFF);
+      tmp[4] = (byte)((i >> 24) & 0xFF);
+      i >>= 32;
+      tmp[3] = (byte)(i & 0xFF);
+      tmp[2] = (byte)((i >> 8) & 0xFF);
+      tmp[1] = (byte)((i >> 16) & 0xFF);
+      tmp[0] = (byte)((i >> 24) & 0xFF);
+      s.Write(tmp, 0, 8);
     }
 
     /// <summary>
