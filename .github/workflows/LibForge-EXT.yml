@@ -3,9 +3,9 @@ name: External Branch Build
 on:
   push:
     branches-ignore:
-      - main
+      - master
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   build:
