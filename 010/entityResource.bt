@@ -1,0 +1,235 @@
+#include "common.bt"
+
+#include "forgetypes.bt"
+
+#define kEntityResourceRev 0x11
+#define kEntityRev 0x1E
+
+LittleEndian();
+typedef struct (int index, int entityRev) {
+    int rev;
+
+    Assert(rev >= 8, "version not >= 8");
+    if(rev >= 0x17)
+    {
+        int unk;
+    }
+    int fileSlotIndex;
+    //Assert(index == fileSlotIndex, "Layer failed to load - serialized for different slot");
+    int16 field28;
+    int arraySize;
+    local int i = 0;
+    local int v33 = 0;
+    for(i = 0; i < arraySize; i++)
+    {
+	    // If these are uncommented then pretty much no RBSongs will parse
+        //if (id.id.layer != index) Assert(false, "id.layer not == index");
+        //if (i != id.id.index) Assert(false, "Failed to load game object");
+        GameObject game_obj(rev);
+        if(game_obj.id.index != 0xfff 
+            && game_obj.obj_rev >= 3 
+            && game_obj.name.strlen == 0)
+        {
+            i--;
+        }
+    }
+} EntityLayer;
+
+struct EntityResource;
+struct Resource;
+typedef struct {
+    int version;
+    if (version > kEntityRev)
+    {
+        // LoadCached
+        struct {
+            int int2;
+            int numComponents;
+            struct {
+                PSTR name;
+                int memoryLayout;
+                int cached;
+            } component[numComponents]<optimize=false>;
+            int size;
+            byte entity[size];
+        } entity;
+        int inlineResources;
+        if (inlineResources > 0) {
+            int numResources;
+            struct {
+                PSTR symbol1;
+                PSTR symbol2;
+                if (symbol1.name == "RndMeshResource") {
+                    #include "HxMesh.bt"
+                } else if (symbol1.name == "WaveformResource<kFloat>") {
+                    WaveformResourceFloat rsrc;
+                } else if (symbol1.name == "RndTexture2DResource") {
+                    #include "ForgeTex.bt"
+                } else {
+                    EntityResource rsrc;
+                    if (symbol1.name == "StateGraphResource") {
+                        int unk2;
+                    }
+                }
+            } resources[numResources]<optimize=false>;
+        }
+    }
+    else {
+        if(version <= 4)
+        {
+          PSTR symbol;
+        }
+        if(version >= 9)
+        {
+          int numLayers;
+        }
+        else
+        {
+            int rootId;
+            if(version > 6)
+            {
+                int numLayers;
+            }
+            else
+            {
+                int16 array_size;
+                if(version <= 1)
+                {
+                  // Read GameObjectIdPropArray
+                    Assert(false, "Version <= 1");
+                }
+                local int numLayers = 1;
+            }
+        }
+    
+        local int li = 0;
+        for (li = 0; li < numLayers; li++)
+        {
+            if (version < 8)
+            {
+              if (version >= 7)
+              {
+                int16 layer_field_28;
+              }
+              if (numLayers != 1)
+              {
+                Assert(false, "numLayers == 1");
+              }
+              int propArrayBaseSize;
+              if (propArrayBaseSize > 0)
+              {
+                Assert(false, "Version < 8 loads objptrs here");
+              }
+            }
+            else if ( version <= 11 )
+            {
+              PSTR layer_names;
+            }
+        }
+        if (version < 8)
+        {
+            if (version >= 2)
+            {
+              Assert(false, "Version >= 2 < 8");
+            }
+        }
+        else
+        {
+            for(li = 0; li < numLayers; li++)
+            {
+                EntityLayer layer(li, version);
+                if(version > 0xC)
+                {
+                    // HACK: Allows reading codemonkey_rbn.rbsong
+                    if(version >= 0x11)
+                    {
+                        if(ReadInt() == 1)
+                        {
+                            int unk, unk2, unk3, unk4;
+                        }
+                    }
+                    int inlineVersion;
+                    int inlineResourceCount;
+                    struct {
+                        PSTR type;
+                        PSTR name;
+                        EntityResource rsrc;
+                    } inline[inlineResourceCount];
+                }
+            }
+        }
+    }
+} Entity;
+
+typedef struct EntityResource {
+    int version;
+    if(version < 0xC || version > kEntityResourceRev)
+    {
+        //Assert(false, "Incompatible version");
+    }
+    int resourceLayerCount;
+    PSTR resourceLayerNames[resourceLayerCount]<optimize=false>;
+    if(version >= 0xF)
+    {
+        int unk0;
+        byte extra_data[unk0];
+        if(version >= 0xF)
+        {
+            int unk1;
+        }
+    }
+    Entity ent;
+} EntityResource;
+
+local string filename = GetFileName();
+typedef int strptr<read=STRPTR_read>;
+string STRPTR_read(int p) {
+    return names.names[p].name;
+}
+
+if (Strstr(filename, ".layout_") != -1 ||
+    Strstr(filename, ".entity_") != -1 ||
+    Strstr(filename, ".scene_") != -1) {
+    int layoutRev;
+    EntityResource file<open=true>;
+} else if (Strstr(filename, ".charanim_") != -1) {
+    EntityResource file<open=true>;
+    CharAnim anim;
+} else if (Strstr(filename, ".sgraph_") != -1) {
+    EntityResource file<open=true>;
+    ShaderGraph sgraph;
+} else if (true) {
+    EntityResource file<open=true>;
+} else {
+    int revision1;
+    int count1;
+    int unk1;
+    int unk2;
+    int unk3;
+    int count1;
+    int sig;
+    int unk;
+    int count2;
+    struct {
+        PSTR name;
+        int sig;
+        int unk;
+    } unk[count2]<optimize=false>;
+    
+    int unk1;
+    int unk2;
+    int unk3;
+    struct {
+        int num_names;
+        struct {
+            string name;
+        } names[num_names]<optimize=false>;
+    } names<open=true>;
+    
+    while(ReadByte() == 0){
+     FSeek(FTell() + 1);
+    }
+    
+    int num_ints;
+    strptr ints[num_ints];
+}

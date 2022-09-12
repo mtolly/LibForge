@@ -1,0 +1,70 @@
+// HMX Forge Texture format (.png_platform, .bmp_platform)
+LittleEndian();
+typedef struct {
+    int Width;
+    int Height;
+    int Flag;
+    if(Version == 0xC) {
+        int unk[2];
+    }
+} MipmapInfo;
+typedef struct {
+    int Size;
+    byte Data[Size];
+} MipmapData;
+
+int Magic;
+int Version;
+Assert(Magic == 6 || Magic == 4, "Magic number == 6 or 4");
+if (Magic == 6 && Version != 0xC) {
+    int Unknown;
+    int Unknown;
+    int UnknownSixteen;
+    int Unknown;
+    int Unknown;
+    int UnknownFlag;
+    int Unknown;
+    int UnknownFour;
+    int Unknown;
+    int UnknownThirtyTwo;
+    int Unk[12];
+    int UnknownSix;
+    int UnknownSixteen2;
+    int Unknown;
+    // these MIGHT be related to texture compression
+    // 1 = DXT1 ??
+    // 3 = DXT5 ??
+    int UnknownCompressionFormat;
+    int UnknownCompressionFormat;
+    int Unknown;
+    int Negative;
+    int Negative;
+    int BitsPerPixel; // Seen: 4 and 8
+    int UnknownTwo;
+    int UnknownOne;
+    int UnknownTwo;
+    int UnknownTwo;
+    int Unknown;
+    int UnknownTwo;
+    int UnknownThree;
+    int Unk2[5];
+}
+else if (Magic == 6 && Version == 0xC) {
+    FSeek(0x84);
+}
+else {
+    FSeek(0xAC);
+}
+
+int MipmapLevels;
+MipmapInfo info[MipmapLevels];
+int Unknown6;
+// Image Data for each mipmap level
+MipmapData ImageData[MipmapLevels]<optimize=false>;
+int Unknown;
+int Unknown;
+float Unknown;
+float Unknown;
+float Unknown;
+float Unknown;
+int Unknown;

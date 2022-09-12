@@ -1,0 +1,11 @@
+// Common definitions for Forge stuff
+
+// pascal string (32-bit length prefixed ASCII)
+typedef struct {
+    uint strlen;
+    char name[strlen]<optimize=false>;
+} PSTR<read=PSTR_READ>;
+string PSTR_READ(PSTR&st){
+    if(st.strlen == 0) return "";
+    return st.name;
+}
