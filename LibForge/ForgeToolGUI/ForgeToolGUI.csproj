@@ -39,70 +39,9 @@
     <Compile Update="Inspectors\StartupInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\SongDataInspector.Designer.cs">
-      <DependentUpon>SongDataInspector.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="ErrorWindow.resx">
-      <DependentUpon>ErrorWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ForgeBrowser.resx">
-      <DependentUpon>ForgeBrowser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\VRConversionInspector.resx">
-      <DependentUpon>VRConversionInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\ConversionInspector.resx">
-      <DependentUpon>ConversionInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\FuserInspector.resx">
-      <DependentUpon>FuserInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\MeshInspector.resx">
-      <DependentUpon>MeshInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\PropertyInspector.resx">
-      <DependentUpon>PropertyInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\RBMidiInspector.resx">
-      <DependentUpon>RBMidiInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\ObjectInspector.resx">
-      <DependentUpon>ObjectInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\StartupInspector.resx">
-      <DependentUpon>StartupInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\StringInspector.resx">
-      <DependentUpon>StringInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\TextureInspector.resx">
-      <DependentUpon>TextureInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <EmbeddedResource Include="Inspectors\SongDataInspector.resx">
-      <DependentUpon>SongDataInspector.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Dependencies\DtxCS\Library\DtxCS.csproj">
