@@ -1,12 +1,6 @@
-This is a fork of LibForge/ForgeTool by Maxton, with continuing work to fix bugs and add features.
-
-Download the latest build from [Appveyor](https://ci.appveyor.com/project/LlysiX/libforge/build/artifacts) or from the [releases page](https://github.com/mtolly/LibForge/releases) if the artifacts have expired
-
-# Original readme follows
-
 ## About This Repository
 
-This is a revival of LibForge, in order to renew the code and also make it compatible with Amplitude 2016.
+This is a fork of LibForge/ForgeTool by Maxton, with continuing work to fix bugs and add features.
 
 # How to Build
 
@@ -20,7 +14,7 @@ Can be downloaded at [GitHub Releases](https://github.com/mtolly/LibForge/releas
 
 ## LibForge
 
-This is a library I'm working on that handles reading, writing, and converting for formats in the Forge engine used by Rock Band 4 and Rock Band VR.
+This is a library we're working on that handles reading, writing, and converting for formats in the Forge engine used by Rock Band 4 and Rock Band VR.
 
 It is licensed under the GNU LGPLv3 and includes two frontends at the moment:
 
@@ -41,6 +35,10 @@ Verbs:
    - converts a Standard Midi File to a Forge midi
   tex2png <input.png/bmp_pc/ps4> <output.png>
    - converts a Forge texture to PNG
+  png2tex <input.png> <output.png/bmp_pc/ps4>");
+   - converts a PNG to a Forge texture");
+  png2amptex <input.png> <output.png_ps3>");
+   - converts a PNG to an Amplitude Forge texture");
   mesh2obj <input.fbx...> <output.obj>
    - converts a Forge mesh to OBJ
   con2gp4 [--scee] [--id 16CHARIDENTIFIER] [--desc "Package Description"] <input_con> <output_dir>
