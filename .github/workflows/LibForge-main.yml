@@ -43,21 +43,21 @@ jobs:
       uses: TheDoctor0/zip-release@main
       with:
         type: 'zip'
-        path: .\LibForge\LibForge\bin\Release\
+        path: .\LibForge\LibForge\bin\Release\net6.0\*
         filename: LibForge-${{ env.version }}.zip
       
     - name: Zip ForgeTool
       uses: TheDoctor0/zip-release@main
       with:
         type: 'zip'
-        path: .\LibForge\ForgeTool\bin\Release\
+        path: .\LibForge\ForgeTool\bin\Release\net6.0\*
         filename: ForgeTool-${{ env.version }}.zip
         
     - name: Zip ForgeToolGUI
       uses: TheDoctor0/zip-release@main
       with:
         type: 'zip'
-        path: .\LibForge\ForgeToolGUI\bin\Release\
+        path: .\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\*
         filename: ForgeToolGUI-${{ env.version }}.zip
       
     - name: GH Release
