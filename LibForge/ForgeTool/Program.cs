@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using DtxCS;
 using DtxCS.DataTypes;
 using GameArchives;
+using GameArchives.STFS;
+using LibForge;
 using LibForge.Ark;
 using LibForge.CSV;
 using LibForge.Lipsync;
@@ -12,6 +16,7 @@ using LibForge.Mesh;
 using LibForge.Midi;
 using LibForge.Milo;
 using LibForge.RBSong;
+using LibForge.SongData;
 using LibForge.Texture;
 using LibForge.Util;
 
@@ -32,6 +37,7 @@ namespace ForgeTool
         using (var fo = File.OpenWrite(args[2]))
           action(fi, fo);
       }
+      var makeark = true;
       var makepkg = true;
       switch (args[0])
       {
@@ -327,6 +333,144 @@ namespace ForgeTool
             }
           }
           break;
+        case "con2rbvr":
+        case "con2vr":
+          {
+            var i = 0;
+            string prefix = null;
+            while (++i < args.Length - 2)
+            {
+              switch (args[i])
+              {
+                case "--noark":
+                  makeark = false;
+                  continue;
+                case "--prefix":
+                  prefix = args[++i];
+                  continue;
+              }
+              break;
+            }
+            var conPath = args[i++];
+            var rbvrPath = args[i++];
+            var conFile = STFSPackage.OpenFile(Util.LocalFile(conPath));
+            var tempDir = Path.Combine(Path.GetTempPath(), "forgetool_tmp_build");
+            var songs = PkgCreator.ConvertDLCPackage(conFile.RootDirectory.GetDirectory("songs"), false);
+            var entitlementNames = new List<string>();
+
+            foreach (DLCSong song in songs)
+            {
+              var shortname = prefix + song.SongData.Shortname;
+
+              if (makeark)
+              {
+                Directory.CreateDirectory(tempDir);
+                var filePrefix = $"pc/songs_download/{shortname}/{shortname}";
+                var arks = new List<List<Tuple<string, IFile, int>>>();
+                arks.Add(new List<Tuple<string, IFile, int>>());
+
+                // convert mogg.dta to dta_pc
+                using (FileStream fs = File.OpenWrite(Path.Combine(tempDir, $"{shortname}.mogg.dta_dta_pc")))
+                  DTX.ToDtb(song.MoggDta, fs, 3, false);
+                arks[0].Add(Tuple.Create($"{filePrefix}.mogg.dta_dta_pc", Util.LocalFile($"{tempDir}/{shortname}.mogg.dta_dta_pc"), -1));
+                // convert moggsong to dta_pc
+                using (FileStream fs = File.OpenWrite(Path.Combine(tempDir, $"{shortname}.moggsong_dta_pc")))
+                  DTX.ToDtb(song.MoggSong, fs, 3, false);
+                arks[0].Add(Tuple.Create($"{filePrefix}.moggsong_dta_pc", Util.LocalFile($"{tempDir}/{shortname}.moggsong_dta_pc"), -1));
+                // add empty vrevents to rbmid
+                song.RBMidi.Format = RBMid.FORMAT_RBVR;
+                song.RBMidi.VREvents = new RBMid.RBVREVENTS();
+                using (var rbmid = File.OpenWrite(Path.Combine(tempDir, $"{shortname}.rbmid_pc")))
+                  RBMidWriter.WriteStream(song.RBMidi, rbmid);
+                arks[0].Add(Tuple.Create($"{filePrefix}.rbmid_pc", Util.LocalFile($"{tempDir}/{shortname}.rbmid_pc"), -1));
+                // add rbsong
+                using (var rbsongFile = File.OpenWrite(Path.Combine(tempDir, $"{shortname}.rbsong")))
+                  new RBSongResourceWriter(rbsongFile).WriteStream(song.RBSong);
+                arks[0].Add(Tuple.Create($"{filePrefix}.rbsong", Util.LocalFile($"{tempDir}/{shortname}.rbsong"), -1));
+                // add songdta
+                song.SongData.KeysRank = 0;
+                song.SongData.RealKeysRank = 0;
+                using (var songdtaFile = File.OpenWrite(Path.Combine(tempDir, $"{shortname}.songdta_pc")))
+                  SongDataWriter.WriteStream(song.SongData, songdtaFile);
+                arks[0].Add(Tuple.Create($"{filePrefix}.songdta_pc", Util.LocalFile($"{tempDir}/{shortname}.songdta_pc"), -1));
+                // add album art (incompatible)
+                if (song.SongData.AlbumArt)
+                {
+                  using (var artFile = File.OpenWrite(Path.Combine(tempDir, $"{shortname}.png_pc")))
+                    TextureWriter.WriteStream(song.Artwork, artFile);
+                  arks[0].Add(Tuple.Create($"{filePrefix}.png_pc", Util.LocalFile($"{tempDir}/{shortname}.png_pc"), -1));
+                }
+                // add mogg
+                arks[0].Add(Tuple.Create($"{filePrefix}.mogg", song.Mogg, -1));
+
+                var builder = new ArkBuilder($"{shortname}_pc", arks);
+                Console.WriteLine($"Writing {shortname}_pc.hdr and ARK files to {rbvrPath}...");
+                builder.Save(rbvrPath, 0x0);
+                entitlementNames.Add($"DLC = song_{shortname}");
+                Directory.Delete(tempDir, true);
+              }
+              else
+              {
+                Console.WriteLine($"Writing songs\\pc\\songs\\{shortname} folder to {rbvrPath}...");
+
+                var songPath = Path.Combine(rbvrPath, "songs", "pc", "songs", shortname);
+                Directory.CreateDirectory(songPath);
+                // add mogg
+                using (var mogg = File.OpenWrite(Path.Combine(songPath, $"{shortname}.mogg")))
+                using (var conMogg = song.Mogg.GetStream())
+                {
+                  conMogg.CopyTo(mogg);
+                }
+                // convert mogg.dta to dta_pc
+                using (FileStream fs = File.OpenWrite(Path.Combine(songPath, $"{shortname}.mogg.dta_dta_pc")))
+                  DTX.ToDtb(song.MoggDta, fs, 3, false);
+                // convert moggsong to dta_pc
+                using (FileStream fs = File.OpenWrite(Path.Combine(songPath, $"{shortname}.moggsong_dta_pc")))
+                  DTX.ToDtb(song.MoggSong, fs, 3, false);
+                // add empty vrevents to rbmid
+                song.RBMidi.Format = RBMid.FORMAT_RBVR;
+                song.RBMidi.VREvents = new RBMid.RBVREVENTS();
+                using (var rbmid = File.OpenWrite(Path.Combine(songPath, $"{shortname}.rbmid_pc")))
+                  RBMidWriter.WriteStream(song.RBMidi, rbmid);
+                // add rbsong
+                using (var rbsongFile = File.OpenWrite(Path.Combine(songPath, $"{shortname}.rbsong")))
+                  new RBSongResourceWriter(rbsongFile).WriteStream(song.RBSong);
+                // add songdta
+                song.SongData.KeysRank = 0;
+                song.SongData.RealKeysRank = 0;
+                using (var songdtaFile = File.OpenWrite(Path.Combine(songPath, $"{shortname}.songdta_pc")))
+                  SongDataWriter.WriteStream(song.SongData, songdtaFile);
+                // add album art
+                if (song.SongData.AlbumArt)
+                {
+                  using (var artFile = File.OpenWrite(Path.Combine(songPath, $"{shortname}.png_pc")))
+                    TextureWriter.WriteStream(song.Artwork, artFile);
+                }
+              }
+            }
+            if (makeark)
+            {
+              Console.WriteLine("Conversion complete! Add the following DLC SKUs to your entitlement list:");
+              foreach (string sku in entitlementNames)
+              {
+                Console.WriteLine(sku);
+                File.WriteAllLines(rbvrPath + "/SKUs.txt", entitlementNames);
+              }
+              Console.WriteLine($"You can also find the SKUs in {rbvrPath}\\SKUs.txt");
+            }
+            else
+            {
+              Console.WriteLine("Conversion complete! Add the songs folder to your main RBVR ark using patchcreator in arkhelper");
+            }
+          }
+          break;
+        case "dta2b":
+          WithIO((fi, fo) =>
+          {
+            DataArray dta = DTX.FromDtaStream(fi);
+            DTX.ToDtb(dta, fo, 3, false);
+          });
+          break;
         case "csv2txt":
           {
             var input = args[1];
@@ -372,7 +516,7 @@ namespace ForgeTool
               Console.WriteLine($"Error: {arkorder} not found.");
               return;
             }
-            var arks = new List<List<Tuple<string, IFile>>>();
+            var arks = new List<List<Tuple<string, IFile, int>>>();
             DataArray arkOrder;
             using (var order = File.OpenRead(arkorder))
             using (var reader = new StreamReader(order))
@@ -380,10 +524,14 @@ namespace ForgeTool
               arkOrder = DtxCS.DTX.FromDtaStream(order);
             }
             int arkIndex = 0;
-            arks.Add(new List<Tuple<string, IFile>>());
+            arks.Add(new List<Tuple<string, IFile, int>>());
             foreach(var x in arkOrder.Children)
             {
-              if (x is DataSymbol s)
+              if (x is DataCommand c && c.Symbol(0).Name == "split_ark")
+              {
+                arkIndex++;
+                arks.Add(new List<Tuple<string, IFile, int>>());
+              } else if (x is DataArray s)
               {
                 var fullPath = Path.Combine(filedir, s.Name.Replace('/', Path.DirectorySeparatorChar));
                 if (!File.Exists(fullPath))
@@ -392,12 +540,7 @@ namespace ForgeTool
                   return;
                 }
                 IFile f = Util.LocalFile(fullPath);
-                arks[arkIndex].Add(Tuple.Create(s.Name, f));
-              }
-              else if (x is DataCommand c && c.Symbol(0).Name == "split_ark")
-              {
-                arkIndex++;
-                arks[arkIndex] = new List<Tuple<string, IFile>>();
+                arks[arkIndex].Add(Tuple.Create(s.Name, f, s.Int(1)));
               }
             }
             var builder = new ArkBuilder(name, arks);
@@ -441,10 +584,20 @@ namespace ForgeTool
       Console.WriteLine("       --scee : make an EU package");
       Console.WriteLine("       --id <16CHARIDENTIFIER> : set the customizable part of the Package ID/Filename");
       Console.WriteLine("       --desc \"Package Description\" : set the description of the package");
+      Console.WriteLine("  con2rbvr [--noark] [--prefix PREFIX] <input_con> <output_dir>");
+      Console.WriteLine("   - converts a CON custom to a RBVR custom in the given game directory");
+      Console.WriteLine("       --noark : creates a songs folder to be used with patchcreator in arkhelper instead of a DLC ARK");
+      Console.WriteLine("       --prefix <PREFIX> : sets a custom prefix to better organize your converted song files");
+      Console.WriteLine("  arkorder <input_hdr> <output_dta>");
+      Console.WriteLine("   - outputs the arkorder DTA of a given ARK HDR file");
+      Console.WriteLine("  arkbuild <input_dir> <input_arkorder> <output_dir> <ark_name>");
+      Console.WriteLine("   - creates an ARK file using files with the specified arkorder in the output directory");
       Console.WriteLine("  milo2lipsync <input.milo_xbox> <output.lipsync>");
       Console.WriteLine("   - converts an uncompressed milo archive to forge lipsync file");
       Console.WriteLine("  csv2txt <input.csv_pc> <output.csv>");
       Console.WriteLine("   - decodes a csv file");
+      Console.WriteLine("  dta2b <input.dta> <output.dta_dta_pc/ps4>");
+      Console.WriteLine("   - converts text dta into encoded dta");
     }
   }
   class CompareException : Exception {

@@ -3,10 +3,26 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GameArchives;
+using GameArchives.STFS;
+using DtxCS;
+using DtxCS.DataTypes;
+using LibForge;
+using LibForge.Ark;
+using LibForge.CSV;
+using LibForge.Lipsync;
+using LibForge.Mesh;
+using LibForge.Midi;
+using LibForge.Milo;
+using LibForge.RBSong;
+using LibForge.SongData;
+using LibForge.Texture;
+using LibForge.Util;
 
 namespace ForgeToolGUI.Inspectors
 {
@@ -35,6 +51,15 @@ namespace ForgeToolGUI.Inspectors
     private void openFolderButton_Click(object sender, EventArgs e)
     {
       fb.openFolder_Click(sender, e);
+    }
+
+    private void button1_Click_1(object sender, EventArgs e)
+    {
+    }
+
+    private void button2_Click(object sender, EventArgs e)
+    {
+      fb.VRConverter();
     }
   }
 }

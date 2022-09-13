@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibForge", "LibForge\LibForge.csproj", "{3684B7E6-0978-487A-895C-D0ED8F6B7B9A}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameArchives", "..\Dependencies\GameArchives\Library\GameArchives.csproj", "{906748F0-3A55-4B20-BCCB-9DC7187F1D5E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibOrbisPkg", "..\Dependencies\LibOrbisPkg\LibOrbisPkg\LibOrbisPkg.csproj", "{B053F491-FF0F-4CBB-B03B-520591BB0441}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DtxCS", "..\Dependencies\DtxCS\Library\DtxCS.csproj", "{8651B5C6-B8F9-4A30-A4E6-37D6CA367306}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +60,12 @@ Global
 		{B053F491-FF0F-4CBB-B03B-520591BB0441}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B053F491-FF0F-4CBB-B03B-520591BB0441}.Release-minimal|Any CPU.ActiveCfg = Release|Any CPU
 		{B053F491-FF0F-4CBB-B03B-520591BB0441}.Release-minimal|Any CPU.Build.0 = Release|Any CPU
+		{8651B5C6-B8F9-4A30-A4E6-37D6CA367306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8651B5C6-B8F9-4A30-A4E6-37D6CA367306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8651B5C6-B8F9-4A30-A4E6-37D6CA367306}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8651B5C6-B8F9-4A30-A4E6-37D6CA367306}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8651B5C6-B8F9-4A30-A4E6-37D6CA367306}.Release-minimal|Any CPU.ActiveCfg = Release|Any CPU
+		{8651B5C6-B8F9-4A30-A4E6-37D6CA367306}.Release-minimal|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

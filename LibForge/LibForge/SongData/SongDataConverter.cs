@@ -12,7 +12,7 @@ namespace LibForge.SongData
     {
       var songId = songDta.Array("song_id");
       var art = songDta.Array("album_art").Any(1);
-      var shortName = "CU_" + songDta.Array("song").Array("name").String(1).Split('/').Last();
+      var shortName = songDta.Array("song").Array("name").String(1).Split('/').Last();
       var songIdNum = (shortName.GetHashCode() & 0xFFFFFF) + 90000000;
       return new SongData
       {
@@ -25,8 +25,8 @@ namespace LibForge.SongData
         BassRank = songDta.Array("rank").Array("bass").Int(1),
         DrumRank = songDta.Array("rank").Array("drum").Int(1),
         GuitarRank = songDta.Array("rank").Array("guitar").Int(1),
-        KeysRank = songDta.Array("rank").Array("keys").Int(1),
-        RealKeysRank = songDta.Array("rank").Array("real_keys").Int(1),
+        KeysRank = songDta.Array("rank").Array("keys")?.Int(1) ?? 0,
+        RealKeysRank = songDta.Array("rank").Array("real_keys")?.Int(1) ?? 0,
         VocalsRank = songDta.Array("rank").Array("vocals").Int(1),
         Cover = false,
         Fake = false,

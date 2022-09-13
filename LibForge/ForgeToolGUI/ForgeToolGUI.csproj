@@ -10,15 +10,30 @@
     <ApplicationIcon>anvil.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DtxCS">
-      <HintPath>..\..\Dependencies\DtxCS.dll</HintPath>
-    </Reference>
     <Reference Include="MidiCS">
       <HintPath>..\..\Dependencies\MidiCS.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Inspectors\ConversionInspector.cs">
+    <Compile Include="ErrorWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ErrorWindow.Designer.cs">
+      <DependentUpon>ErrorWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ForgeBrowser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ForgeBrowser.Designer.cs">
+      <DependentUpon>ForgeBrowser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Inspectors\VRConversionInspector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Inspectors\VRConversionInspector.Designer.cs">
+      <DependentUpon>VRConversionInspector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Inspectors\ConversionInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Inspectors\FuserInspector.cs">
@@ -48,11 +63,89 @@
     <Compile Update="Inspectors\SongDataInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Inspectors\SongDataInspector.Designer.cs">
+      <DependentUpon>SongDataInspector.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="ErrorWindow.resx">
+      <DependentUpon>ErrorWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ForgeBrowser.resx">
+      <DependentUpon>ForgeBrowser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\VRConversionInspector.resx">
+      <DependentUpon>VRConversionInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\ConversionInspector.resx">
+      <DependentUpon>ConversionInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\FuserInspector.resx">
+      <DependentUpon>FuserInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\MeshInspector.resx">
+      <DependentUpon>MeshInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\PropertyInspector.resx">
+      <DependentUpon>PropertyInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\RBMidiInspector.resx">
+      <DependentUpon>RBMidiInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\ObjectInspector.resx">
+      <DependentUpon>ObjectInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\StartupInspector.resx">
+      <DependentUpon>StartupInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\StringInspector.resx">
+      <DependentUpon>StringInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inspectors\TextureInspector.resx">
+      <DependentUpon>TextureInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Inspectors\SongDataInspector.resx">
+      <DependentUpon>SongDataInspector.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Dependencies\GameArchives\Library\GameArchives.csproj" />
-    <ProjectReference Include="..\..\Dependencies\LibOrbisPkg\LibOrbisPkg\LibOrbisPkg.csproj" />
-    <ProjectReference Include="..\LibForge\LibForge.csproj" />
+    <ProjectReference Include="..\..\Dependencies\DtxCS\Library\DtxCS.csproj">
+      <Project>{8651b5c6-b8f9-4a30-a4e6-37d6ca367306}</Project>
+      <Name>DtxCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Dependencies\GameArchives\Library\GameArchives.csproj">
+      <Project>{906748f0-3a55-4b20-bccb-9dc7187f1d5e}</Project>
+      <Name>GameArchives</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Dependencies\LibOrbisPkg\LibOrbisPkg\LibOrbisPkg.csproj">
+      <Project>{b053f491-ff0f-4cbb-b03b-520591bb0441}</Project>
+      <Name>LibOrbisPkg</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LibForge\LibForge.csproj">
+      <Project>{3684b7e6-0978-487a-895c-d0ed8f6b7b9a}</Project>
+      <Name>LibForge</Name>
+    </ProjectReference>
+
   </ItemGroup>
   <ItemGroup>
     <Content Include="anvil.ico" />

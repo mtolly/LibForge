@@ -213,8 +213,8 @@ namespace LibForge.Midi
           "PART REAL_BASS",
           "PART GUITAR",
           "PART REAL_GUITAR",
-          // TODO: Allow these in release builds when shit's no longer borked
-#if DEBUG
+          // TODO: Allow these when shit's no longer borked
+#if false
           "PART KEYS",
           "PART REAL_KEYS_X",
           "PART REAL_KEYS_H",
@@ -427,7 +427,7 @@ namespace LibForge.Midi
             return false;
           }
 
-          if (diff == 3 && rolls.Count > 0 && rolls[rolls.Count - 1].EndTick > e.StartTicks)
+          if (diff == 3 && rolls.Count > 0 && rolls[rolls.Count - 1].EndTick > e.StartTicks && lane != 0 /* MT: don't emit kick lanes */)
           {
             var tmp = rolls[rolls.Count - 1];
             tmp.Lanes |= 1 << lane;

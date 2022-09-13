@@ -6,16 +6,23 @@
     <Deterministic>False</Deterministic>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DtxCS">
-      <HintPath>..\..\Dependencies\DtxCS.dll</HintPath>
-    </Reference>
     <Reference Include="MidiCS">
       <HintPath>..\..\Dependencies\MidiCS.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Dependencies\GameArchives\Library\GameArchives.csproj" />
-    <ProjectReference Include="..\LibForge\LibForge.csproj" />
+  <ProjectReference Include="..\..\Dependencies\DtxCS\Library\DtxCS.csproj">
+      <Project>{8651b5c6-b8f9-4a30-a4e6-37d6ca367306}</Project>
+      <Name>DtxCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Dependencies\GameArchives\Library\GameArchives.csproj">
+      <Project>{906748f0-3a55-4b20-bccb-9dc7187f1d5e}</Project>
+      <Name>GameArchives</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LibForge\LibForge.csproj">
+      <Project>{3684b7e6-0978-487a-895c-d0ed8f6b7b9a}</Project>
+      <Name>LibForge</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

@@ -29,9 +29,22 @@ namespace LibForge.Ark
 
     public void WriteArkorder(TextWriter sw)
     {
+      long[] arkOffsets = new long[arkSizes.Length];
+      long totalOffset = 0;
+      for (int i = 0; i < arkSizes.Length; i++)
+      {
+        arkOffsets[i] = totalOffset;
+        totalOffset += arkSizes[i];
+      }
+      int nextArk = 1;
       foreach(var entry in fileEntries.OrderBy(x => x.Offset))
       {
-        sw.WriteLine("'{0}'", entry.Path);
+        if (arkSizes.Length > nextArk && entry.Offset == arkOffsets[nextArk])
+        {
+          sw.WriteLine("{split_ark}");
+          nextArk++;
+        }
+        sw.WriteLine("('{0}' {1})", entry.Path, entry.Flags);
       }
     }
 

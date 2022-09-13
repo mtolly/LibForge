@@ -256,6 +256,10 @@ namespace ForgeToolGUI
     {
       OpenTab(new Inspectors.ConversionInspector(), "CON to PKG Conversion");
     }
+    public void VRConverter()
+    {
+      OpenTab(new Inspectors.VRConversionInspector(), "Con to VR Conversion");
+    }
     private void convertCONToPKGToolStripMenuItem_Click(object sender, EventArgs e)
     {
       OpenConverter();

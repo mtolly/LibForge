@@ -15,7 +15,7 @@ namespace LibForge.Ark
     private string[] arkNames;
     private uint[] arkSizes;
     private int[] hashTable;
-    private List<List<Tuple<string, IFile>>> layout;
+    private List<List<Tuple<string, IFile, int>>> layout;
     private FileEntry[] entries;
 
     /// <summary>
@@ -23,7 +23,7 @@ namespace LibForge.Ark
     /// </summary>
     /// <param name="name">Name of the archive files. Example: "main_pc"</param>
     /// <param name="ArkFiles">Ordered list of ark files; each of which is a list of ark path / file pairs.</param>
-    public ArkBuilder(string name, List<List<Tuple<string, IFile>>> ArkFiles)
+    public ArkBuilder(string name, List<List<Tuple<string, IFile, int>>> ArkFiles)
     {
       this.name = name;
       layout = ArkFiles;
@@ -35,11 +35,11 @@ namespace LibForge.Ark
       long arkOffset = 0;
       foreach (var ark in layout)
       {
-        foreach(var (path,file) in layout[i])
+        foreach(var (path,file,flags) in layout[i])
         {
           entries[entryIndex++] = new FileEntry()
           {
-            Flags = -1,
+            Flags = flags,
             Size = (uint)file.Size,
             Offset = arkOffset,
             Path = path
@@ -49,7 +49,7 @@ namespace LibForge.Ark
         }
         arkNames[i] = $"{name}_{i++}.ark";
       }
-      Array.Sort(entries, (x, y) => x.Path.CompareTo(y.Path));
+      //Array.Sort(entries, (x, y) => x.Path.CompareTo(y.Path));
       hashTable = new int[entries.Length];
       for (i = 0; i < hashTable.Length; i++) hashTable[i] = -1;
       for(i = 0; i < entries.Length; i++)
@@ -59,12 +59,12 @@ namespace LibForge.Ark
       }
     }
 
-    public void Save(string outPath)
+    public void Save(string outPath, byte xor = 0xFF)
     {
       var hdrPath = Path.Combine(outPath, name + ".hdr");
       using (var s = File.Create(hdrPath))
       {
-        WriteHdr(s);
+        WriteHdr(s, xor);
       }
 
       for(int i = 0; i < arkNames.Length; i++)
@@ -76,9 +76,9 @@ namespace LibForge.Ark
       }
     }
 
-    public void WriteHdr(Stream output)
+    public void WriteHdr(Stream output, byte xor)
     {
-      var cryptStream = new EncryptedWriteStream(output, new Random().Next(), 0xFF);
+      var cryptStream = new EncryptedWriteStream(output, new Random().Next(), xor);
       var w = new BinWriter(cryptStream);
       w.Write(10); // version
       w.Write(1); // unknown
@@ -87,7 +87,7 @@ namespace LibForge.Ark
       w.Write(arkSizes.Length);
       w.Write(arkSizes, w.Write);
       w.Write(arkNames, w.Write);
-      //TODO: What are these strings
+      //TODO: What are these strings - "markers"?
       w.Write(1);
       w.Write(0);
       w.Write(entries, x => x.Save(cryptStream));
@@ -97,7 +97,7 @@ namespace LibForge.Ark
     public void WriteArk(int arkIndex, Stream output)
     {
       if (arkIndex < 0 || arkIndex > layout.Count) throw new ArgumentOutOfRangeException(nameof(arkIndex));
-      foreach(var (_,file) in layout[arkIndex])
+      foreach(var (_,file,_) in layout[arkIndex])
       {
         using (var s = file.GetStream())
         {

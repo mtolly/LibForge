@@ -124,28 +124,61 @@ SHORTNAMES
         }
       }
       var totalTracks = array.Array("song").Array("pans").Array(1).Children.Count;
-      // Get the last track number. This is based on the assumption that the tracks are in order
-      // We have to filter out empty track arrays because GHtoRB(?) does stuff like (keys ()) instead
-      // of leaving out the keys array entirely
-      var lastTrack = ((trackSubArray.Children
-        .Where(x => x is DataArray dx ? dx.Array(1).Children.Count > 0 : false)
-        .Last() as DataArray)
-        .Array(1).Children.Last() as DataAtom).Int;
-      var crowdChannel = array.Array("song").Array("crowd_channels")?.Int(1);
-      if (crowdChannel != null)
+      // Get player track numbers. MT: modified to not require input to be sorted
+      HashSet<int> playerChannels = new HashSet<int>();
+      foreach (DataArray item in trackSubArray.Children.Where(x => x is DataArray))
       {
-        if (crowdChannel == lastTrack + 2)
-          trackSubArray.AddNode(DTX.FromDtaString($"fake ({lastTrack + 1})"));
-        else if (crowdChannel == lastTrack + 3)
-          trackSubArray.AddNode(DTX.FromDtaString($"fake ({lastTrack + 1} {lastTrack + 2})"));
-        trackSubArray.AddNode(DTX.FromDtaString($"crowd ({crowdChannel} {crowdChannel + 1})"));
+        List<DataNode> channels = item.Array(1).Children;
+        foreach (DataAtom channel in channels)
+        {
+          playerChannels.Add(channel.Int);
+        }
       }
-      else
+      // MT: get all crowd channels in a more consistent way
+      List<int> crowdChannels = new List<int>();
+      var crowdData = array.Array("song").Array("crowd_channels");
+      if (crowdData != null)
       {
-        if (totalTracks == lastTrack + 2)
-          trackSubArray.AddNode(DTX.FromDtaString($"fake ({lastTrack + 1})"));
-        else if (totalTracks == lastTrack + 3)
-          trackSubArray.AddNode(DTX.FromDtaString($"fake ({lastTrack + 1} {lastTrack + 2})"));
+        int i = 0;
+        while (true)
+        {
+          int? maybeChannel = crowdData.Int(i);
+          if (maybeChannel == null)
+            break;
+          else
+            crowdChannels.Add(maybeChannel.Value);
+          i++;
+        }
+      }
+      // MT: any other channel not in an instrument or crowd should be under 'fake'
+      List<int> fakeChannels = new List<int>();
+      for (int i = 0; i < totalTracks; i++)
+      {
+        if (!playerChannels.Contains(i) && !crowdChannels.Contains(i))
+        {
+          fakeChannels.Add(i);
+        }
+      }
+      // MT: finally add the fake and crowd parts to the dta, if they aren't empty
+      if (fakeChannels.Count != 0)
+      {
+        string fakeString = "fake (";
+        foreach (var channel in fakeChannels)
+        {
+          fakeString += $" {channel}";
+        }
+        fakeString += ")";
+        trackSubArray.AddNode(DTX.FromDtaString(fakeString));
+      }
+      if (crowdChannels.Count != 0)
+      {
+        string crowdString = "crowd (";
+        foreach (var channel in crowdChannels)
+        {
+          crowdString += $" {channel}";
+        }
+        crowdString += ")";
+        trackSubArray.AddNode(DTX.FromDtaString(crowdString));
       }
       moggDta.AddNode(trackArray);
       moggDta.AddNode(array.Array("song").Array("pans"));
