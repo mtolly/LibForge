@@ -39,25 +39,12 @@ after_build:
    %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
  - >
    7z a ForgeTool-%APPVEYOR_BUILD_VERSION%.zip 
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeTool\bin\Release\net6.0\ForgeTool.exe
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeTool\bin\Release\net6.0\LibForge.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeTool\bin\Release\net6.0\MidiCS.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\GameArchives.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\LibOrbisPkg.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\DtxCS.dll
+   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeTool\bin\Release\net6.0\*
    %APPVEYOR_BUILD_FOLDER%\README.md
    %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
  - >
    7z a ForgeToolGUI-%APPVEYOR_BUILD_VERSION%.zip 
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeTool\bin\Release\net6.0\ForgeTool.exe
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeTool\bin\Release\net6.0\LibForge.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeTool\bin\Release\net6.0\MidiCS.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\GameArchives.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\LibOrbisPkg.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\OpenTK.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\OpenTK.GLControl.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\DtxCS.dll
-   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\ForgeToolGUI.exe
+   %APPVEYOR_BUILD_FOLDER%\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\*
    %APPVEYOR_BUILD_FOLDER%\README.md
    %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
 artifacts:
