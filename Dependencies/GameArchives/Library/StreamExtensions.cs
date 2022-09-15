@@ -5,6 +5,9 @@
 using System;
 using System.Text;
 using System.IO;
+using System.Buffers.Binary;
+using System.Security.Cryptography.X509Certificates;
+
 namespace GameArchives
 {
   internal static class StreamExtensions
@@ -160,14 +163,9 @@ namespace GameArchives
     /// <returns></returns>
     public static int ReadInt32LE(this Stream s)
     {
-      int ret;
-      byte[] tmp = new byte[4];
-      s.Read(tmp, 0, 4);
-      ret = tmp[0] & 0x000000FF;
-      ret |= (tmp[1] << 8) & 0x0000FF00;
-      ret |= (tmp[2] << 16) & 0x00FF0000;
-      ret |= (tmp[3] << 24);
-      return ret;
+      using var reader = new BinaryReader(s, Encoding.UTF8, leaveOpen: true);
+      byte[] tmp = reader.ReadBytes(4);
+      return BinaryPrimitives.ReadInt32LittleEndian(tmp);
     }
 
     /// <summary>
