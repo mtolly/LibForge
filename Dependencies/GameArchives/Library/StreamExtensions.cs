@@ -47,12 +47,9 @@ namespace GameArchives
     /// <returns></returns>
     public static short ReadInt16LE(this Stream s)
     {
-      int ret;
-      byte[] tmp = new byte[2];
-      s.Read(tmp, 0, 2);
-      ret = tmp[0] & 0x00FF;
-      ret |= (tmp[1] << 8) & 0xFF00;
-      return (short)ret;
+      using var reader = new BinaryReader(s, Encoding.UTF8, leaveOpen: true);
+      byte[] tmp = reader.ReadBytes(2);
+      return BinaryPrimitives.ReadInt16LittleEndian(tmp);
     }
 
     /// <summary>
@@ -69,12 +66,9 @@ namespace GameArchives
     /// <returns></returns>
     public static short ReadInt16BE(this Stream s)
     {
-      int ret;
-      byte[] tmp = new byte[2];
-      s.Read(tmp, 0, 2);
-      ret = (tmp[0] << 8) & 0xFF00;
-      ret |= tmp[1] & 0x00FF;
-      return (short)ret;
+      using var reader = new BinaryReader(s, Encoding.UTF8, leaveOpen: true);
+      byte[] tmp = reader.ReadBytes(2);
+      return BinaryPrimitives.ReadInt16BigEndian(tmp);
     }
 
     /// <summary>
@@ -182,14 +176,9 @@ namespace GameArchives
     /// <returns></returns>
     public static int ReadInt32BE(this Stream s)
     {
-      int ret;
-      byte[] tmp = new byte[4];
-      s.Read(tmp, 0, 4);
-      ret = (tmp[0] << 24);
-      ret |= (tmp[1] << 16) & 0x00FF0000;
-      ret |= (tmp[2] << 8) & 0x0000FF00;
-      ret |= tmp[3] & 0x000000FF;
-      return ret;
+      using var reader = new BinaryReader(s, Encoding.UTF8, leaveOpen: true);
+      byte[] tmp = reader.ReadBytes(4);
+      return BinaryPrimitives.ReadInt32BigEndian(tmp);
     }
 
     /// <summary>
@@ -206,19 +195,9 @@ namespace GameArchives
     /// <returns></returns>
     public static long ReadInt64LE(this Stream s)
     {
-      long ret;
-      byte[] tmp = new byte[8];
-      s.Read(tmp, 0, 8);
-      ret = tmp[4] & 0x000000FFL;
-      ret |= (tmp[5] << 8) & 0x0000FF00L;
-      ret |= (tmp[6] << 16) & 0x00FF0000L;
-      ret |= (tmp[7] << 24) & 0xFF000000L;
-      ret <<= 32;
-      ret |= tmp[0] & 0x000000FFL;
-      ret |= (tmp[1] << 8) & 0x0000FF00L;
-      ret |= (tmp[2] << 16) & 0x00FF0000L;
-      ret |= (tmp[3] << 24) & 0xFF000000L;
-      return ret;
+      using var reader = new BinaryReader(s, Encoding.UTF8, leaveOpen: true);
+      byte[] tmp = reader.ReadBytes(8);
+      return BinaryPrimitives.ReadInt64LittleEndian(tmp);
     }
 
     /// <summary>
@@ -235,19 +214,9 @@ namespace GameArchives
     /// <returns></returns>
     public static long ReadInt64BE(this Stream s)
     {
-      long ret;
-      byte[] tmp = new byte[8];
-      s.Read(tmp, 0, 8);
-      ret = tmp[3] & 0x000000FFL;
-      ret |= (tmp[2] << 8) & 0x0000FF00L;
-      ret |= (tmp[1] << 16) & 0x00FF0000L;
-      ret |= (tmp[0] << 24) & 0xFF000000L;
-      ret <<= 32;
-      ret |= tmp[7] & 0x000000FFL;
-      ret |= (tmp[6] << 8) & 0x0000FF00L;
-      ret |= (tmp[5] << 16) & 0x00FF0000L;
-      ret |= (tmp[4] << 24) & 0xFF000000L;
-      return ret;
+      using var reader = new BinaryReader(s, Encoding.UTF8, leaveOpen: true);
+      byte[] tmp = reader.ReadBytes(8);
+      return BinaryPrimitives.ReadInt64BigEndian(tmp);
     }
 
     /// <summary>
