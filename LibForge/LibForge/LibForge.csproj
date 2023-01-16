@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <ProjectReference Include="..\..\Dependencies\DtxCS\Library\DtxCS.csproj">
       <Project>{8651b5c6-b8f9-4a30-a4e6-37d6ca367306}</Project>
       <Name>DtxCS</Name>
