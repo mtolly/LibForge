@@ -139,14 +139,32 @@ SHORTNAMES
       var crowdData = array.Array("song").Array("crowd_channels");
       if (crowdData != null)
       {
+        // I guess "i" should start with 1 instead of 0
         int i = 0;
         while (true)
         {
-          int? maybeChannel = crowdData.Int(i);
+          int? maybeChannel;
+
+          try { 
+          maybeChannel = crowdData.Int(i);
+          }
+
+          // because iam not sure why i starts with 0 try once more if its the first iteration
+          catch {
+            if(i == 0) { 
+              i++;
+              continue;
+            } else {
+              break;
+            }
+          }
+
           if (maybeChannel == null)
+          {
             break;
-          else
+          } else {
             crowdChannels.Add(maybeChannel.Value);
+          }
           i++;
         }
       }
@@ -206,14 +224,14 @@ SHORTNAMES
       var midPath = shortname + ".mid";
       var artPath = $"gen/{shortname}_keep.png_xbox";
       var miloPath = $"gen/{shortname}.milo_xbox";
-      var songId = songDta.Array("song_id").Node(1);
+      // var songId = songDta.Array("song_id").Node(1);
       var name = songDta.Array("name").String(1);
       var artist = songDta.Array("artist").String(1);
       var mid = MidiCS.MidiFileReader.FromBytes(songRoot.GetFileAtPath(midPath).GetBytes());
 
       // TODO: Catch possible conversion exceptions? i.e. Unsupported milo version
       var milo = MiloFile.ReadFromStream(songRoot.GetFileAtPath(miloPath).GetStream());
-      var songData = SongDataConverter.ToSongData(songDta);
+      var songData = SongDataConverter.ToSongData(songDta, songRoot, true);
 
       Texture.Texture artwork = null;
       if (songData.AlbumArt)
@@ -247,7 +265,7 @@ SHORTNAMES
       var dta = DTX.FromPlainTextBytes(dlcRoot.GetFile("songs.dta").GetBytes());
       for (int i = 0; i < dta.Count; i++)
       {
-        metas.Add(SongDataConverter.ToSongData(dta.Array(i)));
+        metas.Add(SongDataConverter.ToSongData(dta.Array(i), dlcRoot));
       }
       return metas;
     }
