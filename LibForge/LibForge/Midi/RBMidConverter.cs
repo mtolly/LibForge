@@ -1150,6 +1150,8 @@ namespace LibForge.Midi
         // Event handlers
         bool AddLyric(MidiText e)
         {
+          // TODO: investigate further what is read from midi
+          try { 
           if (e.Text[0] != '[')
           {
             lyrics.Add(new RBMid.TICKTEXT
@@ -1160,6 +1162,10 @@ namespace LibForge.Midi
             return true;
           }
           return false;
+          } catch
+            {
+            return false;
+          }
         }
         bool AddVocalNote(MidiNote e)
         {
