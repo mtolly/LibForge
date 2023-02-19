@@ -19,50 +19,64 @@ namespace LibForge.Milo
       Entries = new List<IMiloEntry>();
     }
 
+    public static int ReadInt32(Stream stream, Boolean big)
+    {
+      byte[] data = stream.ReadBytes(4);
+      if (big) Array.Reverse(data);
+      return BitConverter.ToInt32(data, 0);
+    }
+
+    public static uint ReadUInt32(Stream stream, Boolean big)
+    {
+      byte[] data = stream.ReadBytes(4);
+      if (big) Array.Reverse(data);
+      return BitConverter.ToUInt32(data, 0);
+    }
+
     public static MiloFile ReadFromStream(Stream stream)
     {
       long startingOffset = stream.Position; // You might not be starting at 0x0
       var structureType = (BlockStructure)stream.ReadUInt32LE();
 
-      if (!(structureType == BlockStructure.MILO_A || structureType == BlockStructure.MILO_D))
-        throw new Exception("Unsupported milo compression");
-
-      int offset = stream.ReadInt32LE(); // Start of blocks
+      uint offset = stream.ReadUInt32LE();
       int blockCount = stream.ReadInt32LE();
-      stream.Seek(4, SeekOrigin.Current); // Skips max uncompressed size
+      int maxBlockSize = stream.ReadInt32LE(); // Skips max uncompressed size
 
       // Reads block sizes
-      int totalSize;
-      if (structureType == BlockStructure.MILO_A)
-      {
-        totalSize = Enumerable.Range(0, blockCount)
-          .Select(x => stream.ReadInt32LE())
-          .Sum();
-      }
-      else // Milo_D
-      {
-        // TODO: Implement zlib block inflation
-        totalSize = Enumerable.Range(0, blockCount)
-          .Select(x =>
-          {
-            var blockSize = stream.ReadInt32LE();
-            var compressed = (blockSize & 0x01_00_00_00) == 0;
-            
-            if (compressed)
-              throw new NotImplementedException("Zlib block inflation not implemented yet");
-          
-            return blockSize & 0xFF_FF_FF;
-          })
-          .Sum();
-      }
+      var sizes = Enumerable.Range(0, blockCount).Select(x => stream.ReadUInt32LE()).ToArray();
 
       // Jumps to first block offset
       stream.Position = startingOffset + offset;
 
-      using (var ms = new MemoryStream()) 
+      using (var ms = new MemoryStream())
       {
-        // Copies raw milo data
-        stream.CopyTo(ms, totalSize);
+        foreach(var size in sizes)
+        {
+          bool compressed = (structureType == BlockStructure.MILO_D && (size & 0xFF000000) == 0)
+                                    || structureType == BlockStructure.MILO_B
+                                    || structureType == BlockStructure.MILO_C;
+
+          uint blockSize = size & 0x00FFFFFF;
+          byte[] block = stream.ReadBytes((int)blockSize);
+
+          if (block.Length > 0 && compressed)
+          {
+            switch (structureType)
+            {
+              case BlockStructure.MILO_B:
+                block = Compression.InflateBlock(block, CompressionType.ZLIB);
+                break;
+              case BlockStructure.MILO_C:
+                block = Compression.InflateBlock(block, CompressionType.GZIP);
+                break;
+              default: // MILO_D
+                block = Compression.InflateBlock(block, CompressionType.ZLIB, 4);
+                break;
+            }
+          }
+          ms.Write(block, 0, block.Length);
+        }
+
         ms.Seek(0, SeekOrigin.Begin);
         return ParseDirectory(ms);
       }
