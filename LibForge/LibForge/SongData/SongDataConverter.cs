@@ -24,7 +24,7 @@ namespace LibForge.SongData
     {
       var songId = songDta.Array("song_id");
       var art = songDta.Array("album_art")?.Any(1) ?? "FALSE";
-      var songName = songDta.Array("song").Array("name").String(1);
+      var songName = songDta.Array("song").Array("name")?.String(1) ?? songDta.Array("song").Array("name")?.Symbol(1).ToString();
       var shortName = songName.Split('/').Last();
       var songIdNum = (shortName.GetHashCode() & 0xFFFFFF) + 90000000;
       // Get MIDI duration dta song_length is not defined, round just to make sure...
