@@ -81,7 +81,7 @@ namespace ForgeToolGUI.Inspectors
         }
         catch (Exception e)
         {
-          logBox.AppendText($"Error loading {filename}: {e.Message}" + Environment.NewLine);
+          logBox.AppendText($"Error loading {filename}: {e.Message}" + Environment.NewLine + "Error Stack:" + Environment.NewLine + e.StackTrace);
         }
       }
       UpdateState();
