@@ -224,7 +224,6 @@ SHORTNAMES
       var midPath = shortname + ".mid";
       var artPath = $"gen/{shortname}_keep.png_xbox";
       var miloPath = $"gen/{shortname}.milo_xbox";
-      // var songId = songDta.Array("song_id").Node(1);
       var name = songDta.Array("name").String(1);
       var artist = songDta.Array("artist").String(1);
       var mid = MidiCS.MidiFileReader.FromBytes(songRoot.GetFileAtPath(midPath).GetBytes());
