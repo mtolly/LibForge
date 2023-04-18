@@ -139,15 +139,20 @@ SHORTNAMES
       var crowdData = array.Array("song").Array("crowd_channels");
       if (crowdData != null)
       {
-        int i = 0;
+        int i = 1;
         while (true)
         {
-          int? maybeChannel = crowdData.Int(i);
-          if (maybeChannel == null)
+          if (i > crowdChannels.Count)
             break;
           else
+          {
+            int? maybeChannel = crowdData.Int(i);
+            //if (maybeChannel == null) //LX: apparently this doesn't work
+            //  break; 
+            //else
             crowdChannels.Add(maybeChannel.Value);
-          i++;
+            i++;
+          }
         }
       }
       // MT: any other channel not in an instrument or crowd should be under 'fake'
