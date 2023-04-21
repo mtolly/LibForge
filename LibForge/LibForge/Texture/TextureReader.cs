@@ -23,7 +23,7 @@ namespace LibForge.Texture
         throw new Exception($"Unknown texture magic {magic}");
       }
       var version = Int();
-      var hdrData = magic == 6 ? FixedArr(Byte, version == 0xC ? 0x7Cu : 0xACu) : FixedArr(Byte, 0xA8);
+      var hdrData = magic == 6 ? FixedArr(Byte, version == 0xC ? 0x7Cu : 0xACu) : FixedArr(Byte, 0xA4);
       var MipmapLevels = UInt();
       var Mipmaps = FixedArr(() => new Texture.Mipmap
       {
