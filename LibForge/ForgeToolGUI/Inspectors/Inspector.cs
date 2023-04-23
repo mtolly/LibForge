@@ -26,7 +26,7 @@ namespace ForgeToolGUI
       switch (obj)
       {
         case Texture i:
-          return new ImageInspector(TextureConverter.ToBitmap(i, 0));
+          return new ImageInspector(TextureConverter.ToBitmap(i, 0, "BC3"));
         case string s:
           return new StringInspector(s);
         case SongData d:

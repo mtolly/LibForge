@@ -68,8 +68,13 @@ namespace ForgeTool
         case "tex2png":
           WithIO((fi, fo) =>
           {
+            var compressionType = "default";
+            if(args.Length > 3)  
+            {
+              compressionType = args[3];
+            }
             var tex = TextureReader.ReadStream(fi);
-            var bitmap = TextureConverter.ToBitmap(tex, 0);
+            var bitmap = TextureConverter.ToBitmap(tex, 0, compressionType);
             bitmap.Save(fo, System.Drawing.Imaging.ImageFormat.Png);
           });
           break;

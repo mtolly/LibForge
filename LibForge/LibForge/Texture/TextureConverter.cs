@@ -26,7 +26,7 @@ namespace LibForge.Texture
          (((input.B * 0x1F / 0xFF) & 0x1F)));
     }
     // TODO: Decode DXT5 alpha channel
-    public static Bitmap ToBitmap(Texture t, int mipmap)
+    public static Bitmap ToBitmap(Texture t, int mipmap, string compressionType)
     {
       var m = t.Mipmaps[mipmap];
       var output = new Bitmap(m.Width, m.Height, PixelFormat.Format32bppArgb);
@@ -34,18 +34,32 @@ namespace LibForge.Texture
       if (m.Data.Length == (imageData.Length * 4))
       {
         Buffer.BlockCopy(m.Data, 0, imageData, 0, m.Data.Length);
-      }
-      else if (m.Data.Length == imageData.Length)
+      } else if (compressionType.ToUpper() == "R8G8")
       {
-        DecodeDXT(m, imageData, true);
-      }
-      else if (m.Data.Length == (imageData.Length / 2))
+        DecodeR8G8(m, imageData);
+      } else if (compressionType.ToUpper() == "BC4")
       {
-        DecodeDXT(m, imageData, false);
+        DecodeBC4(m, imageData);
+      } else if (compressionType.ToUpper() == "BC5")
+      {
+        DecodeBC5(m, imageData);
+      } else if (compressionType.ToUpper() == "DXT" || compressionType.ToLower() == "default" || compressionType.ToUpper() == "BC3")
+      {
+        if (m.Data.Length == imageData.Length)
+        {
+          DecodeDXT(m, imageData, true, compressionType);
+        }
+        else if (m.Data.Length == (imageData.Length / 2))
+        {
+          DecodeDXT(m, imageData, false, compressionType);
+        } else
+        {
+          throw new Exception($"Don't know what to do with this texture (version={t.Version})... Hint: Try R8G8 compressionType");
+        }
       }
       else
       {
-        throw new Exception($"Don't know what to do with this texture (version={t.Version})");
+        throw new Exception("Argument compressionType missing!");
       }
       // Copy data to bitmap
       {
@@ -56,53 +70,283 @@ namespace LibForge.Texture
       return output;
     }
 
-    private static void DecodeDXT(Texture.Mipmap m, int[] imageData, bool DXT5)
+    // (BC4 Block ATI1/3Dc+)
+    private static void DecodeBC4(Texture.Mipmap m, int[] imageData)
     {
-      int[] colors = new int[4];
       using (var s = new MemoryStream(m.Data))
       {
-        ushort[] c = new ushort[4];
-        byte[] iData = new byte[4];
         for (var y = 0; y < m.Height; y += 4)
+        {
           for (var x = 0; x < m.Width; x += 4)
           {
-            if (DXT5) s.Seek(8, SeekOrigin.Current);
-            ushort c0 = s.ReadUInt16LE();
-            ushort c1 = s.ReadUInt16LE();
-            colors[0] = RGB565ToARGB(c0);
-            colors[1] = RGB565ToARGB(c1);
-            var color0 = Color.FromArgb(colors[0]);
-            var color1 = Color.FromArgb(colors[1]);
-            s.Read(iData, 0, 4);
-            if (c0 > c1)
+            float[] red = new float[16];
+
+            byte[] redColorData = s.ReadBytes(8);
+            ushort red0 = redColorData[0];
+            ushort red1 = redColorData[1];
+            red[0] = red0;
+            red[1] = red1;
+            ulong redMask = redColorData[2] | ((ulong)redColorData[3] << 8) | ((ulong)redColorData[4] << 16) | ((ulong)redColorData[5] << 24) | ((ulong)redColorData[6] << 32) | ((ulong)redColorData[7] << 40);
+
+            if (red0 > red1)
             {
-              colors[2] = Color.FromArgb(0xFF,
-                (color0.R * 2 + color1.R) / 3,
-                (color0.G * 2 + color1.G) / 3,
-                (color0.B * 2 + color1.B) / 3).ToArgb();
-              colors[3] = Color.FromArgb(0xFF,
-                (color0.R + (color1.R * 2)) / 3,
-                (color0.G + (color1.G * 2)) / 3,
-                (color0.B + (color1.B * 2)) / 3).ToArgb();
+              // 6 interpolated color values
+              red[2] = (6 * red0 + 1 * red1) / 7.0f; // bit code 010
+              red[3] = (5 * red0 + 2 * red1) / 7.0f; // bit code 011
+              red[4] = (4 * red0 + 3 * red1) / 7.0f; // bit code 100
+              red[5] = (3 * red0 + 4 * red1) / 7.0f; // bit code 101
+              red[6] = (2 * red0 + 5 * red1) / 7.0f; // bit code 110
+              red[7] = (1 * red0 + 6 * red1) / 7.0f; // bit code 111
             }
             else
             {
-              colors[2] = Color.FromArgb(0xFF,
-                (color0.R + color1.R) / 2,
-                (color0.G + color1.G) / 2,
-                (color0.B + color1.B) / 2).ToArgb();
-              colors[3] = Color.Black.ToArgb();
+              // 4 interpolated color values
+              red[2] = (4 * red0 + 1 * red1) / 5.0f; // bit code 010
+              red[3] = (3 * red0 + 2 * red1) / 5.0f; // bit code 011
+              red[4] = (2 * red0 + 3 * red1) / 5.0f; // bit code 100
+              red[5] = (1 * red0 + 4 * red1) / 5.0f; // bit code 101
+              red[6] = 0.0f;                     // bit code 110
+              red[7] = 1.0f;                     // bit code 111
             }
+
             var offset = y * m.Width + x;
+            int currentIndex = 0;
             for (var i = 0; i < 4; i++)
             {
               for (var j = 0; j < 4; j++)
               {
-                var idx = (iData[i] >> (2 * j)) & 0x3;
-                imageData[offset + i * m.Width + j] = colors[idx];
+                int redIndex = (int)((redMask >> (3 * currentIndex)) & 0x7);
+                var selectedRed = red[redIndex];
+
+
+                var color = Color.FromArgb(0XFF, (int)selectedRed, (int)selectedRed, (int)selectedRed).ToArgb();
+                imageData[offset + i * m.Width + j] = color;
+                currentIndex++;
               }
             }
           }
+        }
+      }
+    }
+
+    // usually used for normal maps (BC5 Block ATI2/3Dc)
+    private static void DecodeBC5(Texture.Mipmap m, int[] imageData) {
+
+      using (var s = new MemoryStream(m.Data))
+      {
+        for (var y = 0; y < m.Height; y += 4)
+        {
+          for (var x = 0; x < m.Width; x += 4)
+          {
+            float[] red = new float[16];
+            float[] green = new float[16];
+
+            byte[] redColorData = s.ReadBytes(8);
+            ushort red0 = redColorData[0];
+            ushort red1 = redColorData[1];
+            red[0] = red0;
+            red[1] = red1;
+            ulong redMask = redColorData[2] | ((ulong)redColorData[3] << 8) | ((ulong)redColorData[4] << 16) | ((ulong)redColorData[5] << 24) | ((ulong)redColorData[6] << 32) | ((ulong)redColorData[7] << 40);
+
+            byte[] greenColorData = s.ReadBytes(8);
+            ushort green0 = greenColorData[0];
+            ushort green1 = greenColorData[1];
+            green[0] = green0;
+            green[1] = green1;
+            ulong greenMask = greenColorData[2] | ((ulong)greenColorData[3] << 8) | ((ulong)greenColorData[4] << 16) | ((ulong)greenColorData[5] << 24) | ((ulong)greenColorData[6] << 32) | ((ulong)greenColorData[7] << 40);
+
+            if (red0 > red1)
+            {
+              // 6 interpolated color values
+              red[2] = (6 * red0 + 1 * red1) / 7.0f; // bit code 010
+              red[3] = (5 * red0 + 2 * red1) / 7.0f; // bit code 011
+              red[4] = (4 * red0 + 3 * red1) / 7.0f; // bit code 100
+              red[5] = (3 * red0 + 4 * red1) / 7.0f; // bit code 101
+              red[6] = (2 * red0 + 5 * red1) / 7.0f; // bit code 110
+              red[7] = (1 * red0 + 6 * red1) / 7.0f; // bit code 111
+            }
+            else
+            {
+              // 4 interpolated color values
+              red[2] = (4 * red0 + 1 * red1) / 5.0f; // bit code 010
+              red[3] = (3 * red0 + 2 * red1) / 5.0f; // bit code 011
+              red[4] = (2 * red0 + 3 * red1) / 5.0f; // bit code 100
+              red[5] = (1 * red0 + 4 * red1) / 5.0f; // bit code 101
+              red[6] = 0.0f;                     // bit code 110
+              red[7] = 1.0f;                     // bit code 111
+            }
+
+            if (green0 > green1)
+            {
+              // 6 interpolated color values
+              green[2] = (6 * green0 + 1 * green1) / 7.0f; // bit code 010
+              green[3] = (5 * green0 + 2 * green1) / 7.0f; // bit code 011
+              green[4] = (4 * green0 + 3 * green1) / 7.0f; // bit code 100
+              green[5] = (3 * green0 + 4 * green1) / 7.0f; // bit code 101
+              green[6] = (2 * green0 + 5 * green1) / 7.0f; // bit code 110
+              green[7] = (1 * green0 + 6 * green1) / 7.0f; // bit code 111
+            }
+            else
+            {
+              // 4 interpolated color values
+              green[2] = (4 * green0 + 1 * green1) / 5.0f; // bit code 010
+              green[3] = (3 * green0 + 2 * green1) / 5.0f; // bit code 011
+              green[4] = (2 * green0 + 3 * green1) / 5.0f; // bit code 100
+              green[5] = (1 * green0 + 4 * green1) / 5.0f; // bit code 101
+              green[6] = 0.0f;                     // bit code 110
+              green[7] = 1.0f;                     // bit code 111
+            }
+
+
+            var offset = y * m.Width + x;
+            int currentIndex = 0;
+            for (var i = 0; i < 4; i++)
+            {
+              for (var j = 0; j < 4; j++)
+              {
+                int redIndex = (int)((redMask >> (3 * currentIndex)) & 0x7);
+                var selectedRed = red[redIndex];
+                int greenIndex = (int)((greenMask >> (3 * currentIndex)) & 0x7);
+                var selectedGreen = green[greenIndex];
+
+                // not sure about calculating channel blue
+                // var computedBlue = Math.Sqrt(1.0 - (Math.Pow(selectedRed / 1000, 2)) - (Math.Pow(selectedGreen / 1000, 2))) * 255;
+
+                var color = Color.FromArgb(0XFF, (int)selectedRed, (int)selectedGreen, 0xFF).ToArgb();
+                imageData[offset + i * m.Width + j] = color;
+                currentIndex++;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // seems like this is used for uncompressed normal maps
+    // not sure about calculating blue
+    private static void DecodeR8G8(Texture.Mipmap m, int[] imageData)
+    {
+
+      using (var s = new MemoryStream(m.Data))
+      {
+        for (var i = 0; i < imageData.Length; i++)
+        {
+          ushort red = s.ReadUInt8();
+          ushort green = s.ReadUInt8();
+          //var computedBlue = Math.Sqrt(1.0 - (Math.Pow(red / 1000, 2)) - (Math.Pow(green / 1000, 2))) * 255;
+
+          var color = Color.FromArgb(0xFF, red, green, 0xFF).ToArgb();
+          imageData[i] = color;
+        }
+      }
+    }
+
+
+    private static void DecodeDXT(Texture.Mipmap m, int[] imageData, bool DXT5, string compressionType)
+    {
+      int[] alpha = new int[16];
+      int[] colors = new int[4];
+      using (var s = new MemoryStream(m.Data))
+      {
+        byte[] iData = new byte[4];
+
+        for (var y = 0; y < m.Height; y += 4)
+          for (var x = 0; x < m.Width; x += 4)
+              {
+                byte[] alphaData;
+                ushort alpha0;
+                ushort alpha1;
+                ulong alphaMask = 0;
+                if (DXT5)
+                {
+                  alphaData = s.ReadBytes(8);
+                  alpha0 = alphaData[0];
+                  alpha1 = alphaData[1];
+                  alphaMask = alphaData[2] | ((ulong)alphaData[3] << 8) |
+                  ((ulong)alphaData[4] << 16) | ((ulong)alphaData[5] << 24) |
+                  ((ulong)alphaData[6] << 32) | ((ulong)alphaData[7] << 40);
+
+
+                  alpha[0] = alpha0;
+                  alpha[1] = alpha1;
+
+                  if (alpha0 > alpha1)
+                  {
+                    alpha[2] = (byte)((6 * alpha0 + alpha1) / 7);
+                    alpha[3] = (byte)((5 * alpha0 + 2 * alpha1) / 7);
+                    alpha[4] = (byte)((4 * alpha0 + 3 * alpha1) / 7);
+                    alpha[5] = (byte)((3 * alpha0 + 4 * alpha1) / 7);
+                    alpha[6] = (byte)((2 * alpha0 + 5 * alpha1) / 7);
+                    alpha[7] = (byte)((alpha0 + 6 * alpha1) / 7);
+                  }
+
+                  else
+                  {
+                    alpha[2] = (byte)((4 * alpha0 + alpha1) / 5);
+                    alpha[3] = (byte)((3 * alpha0 + 2 * alpha1) / 5);
+                    alpha[4] = (byte)((2 * alpha0 + 3 * alpha1) / 5);
+                    alpha[5] = (byte)((alpha0 + 4 * alpha1) / 5);
+                    alpha[6] = 0;
+                    alpha[7] = 255;
+                  }
+
+                }
+
+                ushort c0 = s.ReadUInt16LE();
+                ushort c1 = s.ReadUInt16LE();
+                colors[0] = RGB565ToARGB(c0);
+                colors[1] = RGB565ToARGB(c1);
+                var color0 = Color.FromArgb(colors[0]);
+                var color1 = Color.FromArgb(colors[1]);
+                s.Read(iData, 0, 4);
+
+                ulong colorMask = ((ulong)iData[0]) | ((ulong)iData[1] << 8) | ((ulong)iData[2] << 16) | ((ulong)iData[3] << 24);
+
+                if (c0 > c1)
+                {
+                  colors[2] = Color.FromArgb(0xFF,
+                    (color0.R * 2 + color1.R) / 3,
+                    (color0.G * 2 + color1.G) / 3,
+                    (color0.B * 2 + color1.B) / 3).ToArgb();
+                  colors[3] = Color.FromArgb(0xFF,
+                    (color0.R + (color1.R * 2)) / 3,
+                    (color0.G + (color1.G * 2)) / 3,
+                    (color0.B + (color1.B * 2)) / 3).ToArgb();
+                }
+                else
+                {
+                  colors[2] = Color.FromArgb(0xFF,
+                    (color0.R + color1.R) / 2,
+                    (color0.G + color1.G) / 2,
+                    (color0.B + color1.B) / 2).ToArgb();
+                  colors[3] = Color.Black.ToArgb();
+                }
+                var offset = y * m.Width + x;
+                int currentIndex = 0;
+                for (var i = 0; i < 4; i++)
+                {
+                  for (var j = 0; j < 4; j++)
+                  {
+                    if (DXT5)
+                    {
+                      var idx = (colorMask >> (2 * currentIndex)) & 0x3;
+                      // var idx = (iData[i] >> (2 * j)) & 0x3;
+                      var selectedColor = colors[idx];
+                      int alphaIndex = (int)((alphaMask >> (3 * currentIndex)) & 0x7);
+                      var selectedAlpha = alpha[alphaIndex];
+                      var colorWithoutAlpha = Color.FromArgb(selectedColor);
+                      var colorWithAlpha = Color.FromArgb(selectedAlpha, colorWithoutAlpha).ToArgb();
+                      imageData[offset + i * m.Width + j] = colorWithAlpha;
+                    }
+                    else
+                    {
+                      var idx = (iData[i] >> (2 * j)) & 0x3;
+                      imageData[offset + i * m.Width + j] = colors[idx];
+                    }
+                    currentIndex++;
+                  }
+                }
+            }
       }
     }
 
