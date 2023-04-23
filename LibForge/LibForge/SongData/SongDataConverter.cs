@@ -15,7 +15,9 @@ namespace LibForge.SongData
     the70s = 1970,
     the80s = 1980,
     the90s = 1990,
-    the00s = 2000
+    the00s = 2000,
+    the10s = 2010,
+    the20s = 2020
   }
   public class SongDataConverter
   {
@@ -39,8 +41,8 @@ namespace LibForge.SongData
 
       var songLength = songDta.Array("song_length")?.Int(1) ?? midiDuration;
 
-      // 
-      string decade = songDta.Array("decade")?.String(1) ?? "the00s";
+      
+      string decade = songDta.Array("decade")?.Any(1).ToString() ?? "the00s";
       var decadeInt = (int)Enum.Parse(typeof(Decade), decade);
 
 
