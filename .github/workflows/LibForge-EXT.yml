@@ -1,0 +1,40 @@
+name: External Branch Build
+
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.3
+      with:
+        vs-version: 17.3.3
+        msbuild-architecture: x64
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.1.1
+      with:
+        nuget-version: latest
+
+    - name: Clear NuGet cache
+      run: dotnet nuget locals all --clear
+     
+    - name: Restore NuGet Packages
+      working-directory: ./LibForge/
+      run: nuget restore LibForge.sln
+
+    - name: Build LibForge
+      working-directory: ./LibForge/
+      run: msbuild LibForge.sln /p:Configuration=Release /p:DeployOnBuild=true

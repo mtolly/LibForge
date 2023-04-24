@@ -1,0 +1,70 @@
+name: Main Compilation
+
+on:
+  push:
+    branches: [ "master" ]
+    
+env:
+  version: 0.1.${{ github.run_number }}
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.3
+      with:
+        vs-version: 17.3.3
+        msbuild-architecture: x64
+        
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.1.1
+      with:
+        nuget-version: latest
+        
+    - name: Clear NuGet cache
+      run: dotnet nuget locals all --clear
+     
+    - name: Restore NuGet Packages
+      working-directory: ./LibForge/
+      run: nuget restore LibForge.sln
+        
+    - name: Build LibForge
+      working-directory: ./LibForge/
+      run: msbuild LibForge.sln /p:Configuration=Release /p:DeployOnBuild=true
+      
+    - name: Zip LibForge
+      uses: TheDoctor0/zip-release@main
+      with:
+        type: 'zip'
+        path: .\LibForge\LibForge\bin\Release\net6.0\*
+        filename: LibForge-${{ env.version }}.zip
+      
+    - name: Zip ForgeTool
+      uses: TheDoctor0/zip-release@main
+      with:
+        type: 'zip'
+        path: .\LibForge\ForgeTool\bin\Release\net6.0\*
+        filename: ForgeTool-${{ env.version }}.zip
+        
+    - name: Zip ForgeToolGUI
+      uses: TheDoctor0/zip-release@main
+      with:
+        type: 'zip'
+        path: .\LibForge\ForgeToolGUI\bin\Release\net6.0-windows\*
+        filename: ForgeToolGUI-${{ env.version }}.zip
+      
+    - name: GH Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "LibForge-${{ env.version }}.zip,ForgeTool-${{ env.version }}.zip,ForgeToolGUI-${{ env.version }}.zip"
+        generateReleaseNotes: true
+        name: Release ${{ env.version }}
+        tag: ${{ env.version }}
+        token: ${{ secrets.GITHUB_TOKEN }}

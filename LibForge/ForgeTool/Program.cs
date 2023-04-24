@@ -81,6 +81,14 @@ namespace ForgeTool
             TextureWriter.WriteStream(tex, fo);
           });
           break;
+        case "png2amptex":
+          WithIO((fi, fo) =>
+          {
+            var img = System.Drawing.Image.FromStream(fi);
+            var tex = TextureConverter.ToTextureMaintainingSize(img);
+            TextureWriter.WriteStreamBigEndian(tex, fo);
+          });
+          break;
         case "milopng2tex":
           WithIO((fi, fo) =>
           {
@@ -560,6 +568,10 @@ namespace ForgeTool
       Console.WriteLine("   - converts a Standard Midi File to a Forge midi");
       Console.WriteLine("  tex2png <input.png/bmp_pc/ps4> <output.png>");
       Console.WriteLine("   - converts a Forge texture to PNG");
+      Console.WriteLine("  png2tex <input.png> <output.png/bmp_pc/ps4>");
+      Console.WriteLine("   - converts a PNG to a Forge texture");
+      Console.WriteLine("  png2amptex <input.png> <output.png_ps3>");
+      Console.WriteLine("   - converts a PNG to an Amplitude Forge texture");
       Console.WriteLine("  mesh2obj <input.fbx...> <output.obj>");
       Console.WriteLine("   - converts a Forge mesh to OBJ");
       Console.WriteLine("  con2gp4 [--scee] [--id 16CHARIDENTIFIER] [--desc \"Package Description\"] <input_con> <output_dir>");

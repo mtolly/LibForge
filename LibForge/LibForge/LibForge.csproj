@@ -1,125 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3684B7E6-0978-487A-895C-D0ED8F6B7B9A}</ProjectGuid>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LibForge</RootNamespace>
-    <AssemblyName>LibForge</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MidiCS">
       <HintPath>..\..\Dependencies\MidiCS.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ark\Archive.cs" />
-    <Compile Include="Ark\ArkBuilder.cs" />
-    <Compile Include="Ark\FileEntry.cs" />
-    <Compile Include="Ark\Hash.cs" />
-    <Compile Include="CSV\CsvData.cs" />
-    <Compile Include="Engine\Component.cs" />
-    <Compile Include="Engine\GameObject.cs" />
-    <Compile Include="Engine\Entity.cs" />
-    <Compile Include="Engine\DataTypes.cs" />
-    <Compile Include="Engine\EntityResource.cs" />
-    <Compile Include="Engine\Resource.cs" />
-    <Compile Include="Fuser\FuserAsset.cs" />
-    <Compile Include="Fuser\FusionPatch.cs" />
-    <Compile Include="Fuser\FusionPatchResource.cs" />
-    <Compile Include="Fuser\MidiFileResource.cs" />
-    <Compile Include="Fuser\MidiMusicResource.cs" />
-    <Compile Include="Fuser\MoggSampleResource.cs" />
-    <Compile Include="Fuser\ResourceFile.cs" />
-    <Compile Include="Fuser\UnknownResource.cs" />
-    <Compile Include="Midi\MidiFileResource.cs" />
-    <Compile Include="Midi\MidiFileResourceReader.cs" />
-    <Compile Include="Midi\MidiFileResourceWriter.cs" />
-    <Compile Include="LipSync\FrameGroup.cs" />
-    <Compile Include="LipSync\KeyFrame.cs" />
-    <Compile Include="Lipsync\Lipsync.cs" />
-    <Compile Include="LipSync\LipsyncConverter.cs" />
-    <Compile Include="Lipsync\LipsyncReader.cs" />
-    <Compile Include="Lipsync\LipsyncWriter.cs" />
-    <Compile Include="LipSync\VisemeEvent.cs" />
-    <Compile Include="Mesh\HxMesh.cs" />
-    <Compile Include="Mesh\HxMeshConverter.cs" />
-    <Compile Include="Mesh\HxMeshReader.cs" />
-    <Compile Include="Mesh\HxMeshWriter.cs" />
-    <Compile Include="Meta.cs" />
-    <Compile Include="Midi\MidiHelper.cs" />
-    <Compile Include="Midi\RBMid.cs" />
-    <Compile Include="Midi\RBMidConverter.cs" />
-    <Compile Include="Midi\RBMidReader.cs" />
-    <Compile Include="Milo\BlockStructure.cs" />
-    <Compile Include="Milo\CharLipSync.cs" />
-    <Compile Include="Milo\MiloFile.cs" />
-    <Compile Include="Milo\IMiloEntry.cs" />
-    <Compile Include="RBSong\PropAnimResource.cs" />
-    <Compile Include="Util\BinWriter.cs" />
-    <Compile Include="Util\EncryptedReadStream.cs" />
-    <Compile Include="Util\EncryptedWriteStream.cs" />
-    <Compile Include="Util\IDataSerializable.cs" />
-    <Compile Include="Util\PkgCreator.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Midi\RBMidWriter.cs" />
-    <Compile Include="RBSong\RBSongResource.cs" />
-    <Compile Include="RBSong\RBSongConverter.cs" />
-    <Compile Include="RBSong\RBSongResourceWriter.cs" />
-    <Compile Include="Util\ReaderBase.cs" />
-    <Compile Include="SongData\SongData.cs" />
-    <Compile Include="SongData\SongDataConverter.cs" />
-    <Compile Include="SongData\SongDataReader.cs" />
-    <Compile Include="SongData\SongDataWriter.cs" />
-    <Compile Include="DLCSong.cs" />
-    <Compile Include="Extensions\StreamExtensions.cs" />
-    <Compile Include="Texture\Texture.cs" />
-    <Compile Include="Texture\TextureConverter.cs" />
-    <Compile Include="Texture\TextureReader.cs" />
-    <Compile Include="Texture\TextureWriter.cs" />
-    <Compile Include="Util\BinReader.cs" />
-    <Compile Include="Util\WriterBase.cs" />
+    <ProjectReference Include="..\..\Dependencies\GameArchives\Library\GameArchives.csproj" />
+    <ProjectReference Include="..\..\Dependencies\LibOrbisPkg\LibOrbisPkg\LibOrbisPkg.csproj" />
   </ItemGroup>
   <ItemGroup>
+
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <ProjectReference Include="..\..\Dependencies\DtxCS\Library\DtxCS.csproj">
       <Project>{8651b5c6-b8f9-4a30-a4e6-37d6ca367306}</Project>
       <Name>DtxCS</Name>
@@ -132,6 +36,6 @@
       <Project>{b053f491-ff0f-4cbb-b03b-520591bb0441}</Project>
       <Name>LibOrbisPkg</Name>
     </ProjectReference>
+
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

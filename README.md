@@ -1,22 +1,20 @@
-This is a fork of LibForge/ForgeTool by Maxton, with continuing work to fix bugs and add features.
-
-Download the latest build from [Appveyor](https://ci.appveyor.com/project/LlysiX/libforge/build/artifacts) or from the [releases page](https://github.com/mtolly/LibForge/releases) if the artifacts have expired
-
-# Original readme follows
-
 ## About This Repository
 
-I am keeping track of my research into RB4 customs here.
+This is a fork of LibForge/ForgeTool by Maxton, with continuing work to fix bugs and add features.
 
-I am working out the structure of the files in Rock Band 4. These are being documented in the form of 010 Editor Template files, which are in the `010` directory.
+# How to Build
+
+You need: .NET 6 | .NET Core 3.1
+
+Compile using LibForge.sln, when the compilation is complete, there should be a bin folder inside each program folder. (ForgeTool, ForgeToolGUI, LibForge, LibForgeTests)
 
 ## Latest Build
 
-Can be downloaded at [Appveyor](https://ci.appveyor.com/project/maxton/libforge/branch/master/artifacts)
+Can be downloaded at [GitHub Releases](https://github.com/mtolly/LibForge/releases)
 
 ## LibForge
 
-This is a library I'm working on that handles reading, writing, and converting for formats in the Forge engine used by Rock Band 4 and Rock Band VR.
+This is a library we're working on that handles reading, writing, and converting for formats in the Forge engine used by Rock Band 4 and Rock Band VR.
 
 It is licensed under the GNU LGPLv3 and includes two frontends at the moment:
 
@@ -37,6 +35,10 @@ Verbs:
    - converts a Standard Midi File to a Forge midi
   tex2png <input.png/bmp_pc/ps4> <output.png>
    - converts a Forge texture to PNG
+  png2tex <input.png> <output.png/bmp_pc/ps4>");
+   - converts a PNG to a Forge texture");
+  png2amptex <input.png> <output.png_ps3>");
+   - converts a PNG to an Amplitude Forge texture");
   mesh2obj <input.fbx...> <output.obj>
    - converts a Forge mesh to OBJ
   con2gp4 [--scee] [--id 16CHARIDENTIFIER] [--desc "Package Description"] <input_con> <output_dir>

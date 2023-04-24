@@ -1,0 +1,90 @@
+version: 0.2.{build}
+
+
+branches:
+  only:
+    - master
+
+image: Visual Studio 2019
+
+configuration: Release
+
+platform: Any CPU
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}.0'
+  assembly_file_version: '{version}.0'
+  assembly_informational_version: '{version}.0'
+  
+install:
+- cmd: git submodule update --init --recursive
+
+before_build:
+- cmd: nuget restore LibOrbisPkg.sln
+
+build:
+  project: LibOrbisPkg.sln
+  parallel: true
+  verbosity: minimal
+
+after_build:
+ - dotnet publish -c Release -r linux-x64 /p:PublishSingleFile=true PkgTool.Core
+ - dotnet publish -c Release -r osx-x64 /p:PublishSingleFile=true PkgTool.Core
+ - >
+   7z a PkgEditor-%APPVEYOR_BUILD_VERSION%.zip 
+   %APPVEYOR_BUILD_FOLDER%\PkgEditor\bin\Release\PkgEditor.exe
+   %APPVEYOR_BUILD_FOLDER%\LibOrbisPkg\bin\Release\LibOrbisPkg.dll
+   %APPVEYOR_BUILD_FOLDER%\README.md
+   %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
+ - >
+   7z a PkgTool-%APPVEYOR_BUILD_VERSION%.zip 
+   %APPVEYOR_BUILD_FOLDER%\PkgTool\bin\Release\PkgTool.exe
+   %APPVEYOR_BUILD_FOLDER%\LibOrbisPkg\bin\Release\LibOrbisPkg.dll
+   %APPVEYOR_BUILD_FOLDER%\README.md
+   %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
+ - >
+   7z a LibOrbisPkg-%APPVEYOR_BUILD_VERSION%.zip 
+   %APPVEYOR_BUILD_FOLDER%\LibOrbisPkg\bin\Release\LibOrbisPkg.dll
+   %APPVEYOR_BUILD_FOLDER%\README.md
+   %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
+ - >
+   7z a PkgEditor.Core-%APPVEYOR_BUILD_VERSION%.zip 
+   %APPVEYOR_BUILD_FOLDER%\PkgEditor.Core\bin\Release\netcoreapp3.0\PkgEditor.Core.exe
+   %APPVEYOR_BUILD_FOLDER%\PkgEditor.Core\bin\Release\netcoreapp3.0\PkgEditor.Core.dll
+   %APPVEYOR_BUILD_FOLDER%\PkgEditor.Core\bin\Release\netcoreapp3.0\PkgEditor.Core.runtimeconfig.json
+   %APPVEYOR_BUILD_FOLDER%\PkgEditor.Core\bin\Release\netcoreapp3.0\LibOrbisPkg.Core.dll
+   %APPVEYOR_BUILD_FOLDER%\README.md
+   %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
+ - >
+   7z a PkgTool.Core-%APPVEYOR_BUILD_VERSION%.zip 
+   %APPVEYOR_BUILD_FOLDER%\PkgTool.Core\bin\Release\netcoreapp3.0\PkgTool.Core.exe
+   %APPVEYOR_BUILD_FOLDER%\PkgTool.Core\bin\Release\netcoreapp3.0\PkgTool.Core.dll
+   %APPVEYOR_BUILD_FOLDER%\PkgTool.Core\bin\Release\netcoreapp3.0\PkgTool.Core.runtimeconfig.json
+   %APPVEYOR_BUILD_FOLDER%\PkgTool.Core\bin\Release\netcoreapp3.0\LibOrbisPkg.Core.dll
+   %APPVEYOR_BUILD_FOLDER%\README.md
+   %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
+ - >
+   7z a PkgTool.Core-linux-x64-%APPVEYOR_BUILD_VERSION%.zip 
+   "%APPVEYOR_BUILD_FOLDER%\PkgTool.Core\bin\Any CPU\Release\netcoreapp3.0\linux-x64\publish\PkgTool.Core"
+   %APPVEYOR_BUILD_FOLDER%\README.md
+   %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
+ - >
+   7z a PkgTool.Core-osx-x64-%APPVEYOR_BUILD_VERSION%.zip 
+   "%APPVEYOR_BUILD_FOLDER%\PkgTool.Core\bin\Any CPU\Release\netcoreapp3.0\osx-x64\publish\PkgTool.Core"
+   %APPVEYOR_BUILD_FOLDER%\README.md
+   %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
+ - >
+   7z a LibOrbisPkg.Core-%APPVEYOR_BUILD_VERSION%.zip 
+   %APPVEYOR_BUILD_FOLDER%\LibOrbisPkg.Core\bin\Release\netcoreapp3.0\LibOrbisPkg.Core.dll
+   %APPVEYOR_BUILD_FOLDER%\README.md
+   %APPVEYOR_BUILD_FOLDER%\LICENSE.txt
+artifacts:
+- path: PkgEditor-%APPVEYOR_BUILD_VERSION%.zip
+- path: PkgTool-%APPVEYOR_BUILD_VERSION%.zip
+- path: LibOrbisPkg-%APPVEYOR_BUILD_VERSION%.zip
+- path: PkgEditor.Core-%APPVEYOR_BUILD_VERSION%.zip
+- path: PkgTool.Core-%APPVEYOR_BUILD_VERSION%.zip
+- path: LibOrbisPkg.Core-%APPVEYOR_BUILD_VERSION%.zip
+- path: PkgTool.Core-linux-x64-%APPVEYOR_BUILD_VERSION%.zip 
+- path: PkgTool.Core-osx-x64-%APPVEYOR_BUILD_VERSION%.zip 

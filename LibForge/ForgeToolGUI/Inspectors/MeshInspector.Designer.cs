@@ -28,7 +28,7 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.glControl1 = new OpenTK.GLControl();
+      this.glControl1 = new OpenTK.WinForms.GLControl();
       this.checkBox1 = new System.Windows.Forms.CheckBox();
       this.label1 = new System.Windows.Forms.Label();
       this.trisLabel = new System.Windows.Forms.Label();
@@ -47,7 +47,6 @@
       this.glControl1.Name = "glControl1";
       this.glControl1.Size = new System.Drawing.Size(721, 652);
       this.glControl1.TabIndex = 0;
-      this.glControl1.VSync = false;
       this.glControl1.Load += new System.EventHandler(this.glControl1_Load);
       this.glControl1.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl1_Paint);
       this.glControl1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.glControl1_MouseDown);
@@ -125,7 +124,7 @@
 
     #endregion
 
-    private OpenTK.GLControl glControl1;
+    private OpenTK.WinForms.GLControl glControl1;
     private System.Windows.Forms.CheckBox checkBox1;
     private System.Windows.Forms.Label label1;
     private System.Windows.Forms.Label trisLabel;

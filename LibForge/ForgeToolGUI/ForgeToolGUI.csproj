@@ -1,37 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{233099F7-0471-4064-B000-F6DDE21E64E6}</ProjectGuid>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>ForgeToolGUI</RootNamespace>
-    <AssemblyName>ForgeToolGUI</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>anvil.ico</ApplicationIcon>
@@ -40,166 +13,35 @@
     <Reference Include="MidiCS">
       <HintPath>..\..\Dependencies\MidiCS.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK.GLControl, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.GLControl.3.0.1\lib\net20\OpenTK.GLControl.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ErrorWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ErrorWindow.Designer.cs">
-      <DependentUpon>ErrorWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ForgeBrowser.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ForgeBrowser.Designer.cs">
-      <DependentUpon>ForgeBrowser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\VRConversionInspector.cs">
+    <Compile Update="Inspectors\FuserInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\VRConversionInspector.Designer.cs">
-      <DependentUpon>VRConversionInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\ConversionInspector.cs">
+    <Compile Update="Inspectors\MeshInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\ConversionInspector.Designer.cs">
-      <DependentUpon>ConversionInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\FuserInspector.cs">
+    <Compile Update="Inspectors\PropertyInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\FuserInspector.Designer.cs">
-      <DependentUpon>FuserInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\MeshInspector.cs">
+    <Compile Update="Inspectors\RBMidiInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\MeshInspector.Designer.cs">
-      <DependentUpon>MeshInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\PropertyInspector.cs">
+    <Compile Update="Inspectors\ObjectInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\PropertyInspector.Designer.cs">
-      <DependentUpon>PropertyInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\RBMidiInspector.cs">
+    <Compile Update="Inspectors\StringInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\RBMidiInspector.Designer.cs">
-      <DependentUpon>RBMidiInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\Inspector.cs" />
-    <Compile Include="Inspectors\ObjectInspector.cs">
+    <Compile Update="Inspectors\TextureInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\ObjectInspector.Designer.cs">
-      <DependentUpon>ObjectInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\StringInspector.cs">
+    <Compile Update="Inspectors\StartupInspector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Inspectors\StringInspector.Designer.cs">
-      <DependentUpon>StringInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\TextureInspector.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Inspectors\TextureInspector.Designer.cs">
-      <DependentUpon>TextureInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Inspectors\StartupInspector.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Inspectors\StartupInspector.Designer.cs">
-      <DependentUpon>StartupInspector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Inspectors\SongDataInspector.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Inspectors\SongDataInspector.Designer.cs">
-      <DependentUpon>SongDataInspector.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="ErrorWindow.resx">
-      <DependentUpon>ErrorWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ForgeBrowser.resx">
-      <DependentUpon>ForgeBrowser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\VRConversionInspector.resx">
-      <DependentUpon>VRConversionInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\ConversionInspector.resx">
-      <DependentUpon>ConversionInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\FuserInspector.resx">
-      <DependentUpon>FuserInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\MeshInspector.resx">
-      <DependentUpon>MeshInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\PropertyInspector.resx">
-      <DependentUpon>PropertyInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\RBMidiInspector.resx">
-      <DependentUpon>RBMidiInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\ObjectInspector.resx">
-      <DependentUpon>ObjectInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\StartupInspector.resx">
-      <DependentUpon>StartupInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\StringInspector.resx">
-      <DependentUpon>StringInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Inspectors\TextureInspector.resx">
-      <DependentUpon>TextureInspector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <EmbeddedResource Include="Inspectors\SongDataInspector.resx">
-      <DependentUpon>SongDataInspector.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Dependencies\DtxCS\Library\DtxCS.csproj">
@@ -218,9 +60,20 @@
       <Project>{3684b7e6-0978-487a-895c-d0ed8f6b7b9a}</Project>
       <Name>LibForge</Name>
     </ProjectReference>
+
   </ItemGroup>
   <ItemGroup>
     <Content Include="anvil.ico" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="OpenTK" Version="4.7.5" />
+    <PackageReference Include="OpenTK.Mathematics" Version="4.7.5" />
+    <PackageReference Include="OpenTK.WinForms" Version="4.0.0-pre.6" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
+  </ItemGroup>
 </Project>
