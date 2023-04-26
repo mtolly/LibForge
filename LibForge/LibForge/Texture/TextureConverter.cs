@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using LibForge.Extensions;
 
 namespace LibForge.Texture
@@ -25,16 +27,165 @@ namespace LibForge.Texture
          (((input.G * 0x3F / 0xFF) & 0x3F) << 5) |
          (((input.B * 0x1F / 0xFF) & 0x1F)));
     }
+
+    // use texconv.exe to convert images
+
+    static byte[] DDSHeader = new byte[]
+{
+  //  0     1     2     3     4     5     6     7     8     9     0A    0B    0C    0D    0E    0F
+      0x44, 0x44, 0x53, 0x20, 0x7C, 0x00, 0x00, 0x00, 0x07, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+      0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00,
+      0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
+
+    static readonly short heightHeaderOffset = 0xC;
+    static readonly short widthHeaderOffset = 0x10;
+    static readonly short pitchHeaderOffset = 0x14;
+    static readonly short compressionTypeOffset = 0x54;
+
+    public static byte[] getHeaderCompressionType (string compressionType)
+    {
+      String translatedCompressionType = "";
+      if(compressionType.ToUpper().Contains("BC1"))
+      {
+        translatedCompressionType = "DXT1";
+      } else if (compressionType.ToUpper().Contains("BC2"))
+      {
+        translatedCompressionType = "DXT3";
+      } else if (compressionType.ToUpper().Contains("BC3"))
+      {
+        translatedCompressionType = "DXT5";
+      } else if (compressionType.ToUpper().Contains("BC4"))
+      {
+        translatedCompressionType = "ATI1";
+      } else if (compressionType.ToUpper().Contains("BC5") && !compressionType.ToUpper().Contains("BC5_SNORM")) 
+      {
+        translatedCompressionType = "ATI2";
+      } else
+      {
+        translatedCompressionType = "DX10";
+      }
+
+      return new UTF8Encoding().GetBytes(translatedCompressionType);
+    }
+
+    public static byte[] convertIntToByteArray(int number)
+    {
+      byte[] bytes = BitConverter.GetBytes(number);
+      return bytes;
+    }
+
+    public static int pitchCalculation(int width, string compressionType = "BC1") 
+    {
+      var blockSize = 16;
+      if(compressionType.ToUpper().Contains("DXT1") || compressionType.ToUpper().Contains("BC1") || compressionType.ToUpper().Contains("BC4"))
+      {
+        blockSize = 8;
+      }
+
+      if(compressionType.ToUpper().Contains("BC") ||compressionType.ToUpper().Contains("BC"))
+      {
+        return Math.Max(1, ((width + 3) / 4)) * blockSize;
+      } else if (compressionType.ToUpper().Contains("R8G8_B8G8") || compressionType.ToUpper().Contains("G8R8_G8B8") || compressionType.ToUpper().Contains("UYVY") || compressionType.ToUpper().Contains("YUY2"))
+      {
+        return ((width + 1) >> 1) * 4;
+      } else
+      {
+        // dont know about bpp right now
+        var bitsPerPixel = 8;
+        return (width * bitsPerPixel + 7) / 8;
+      }
+    }
+/*
+    public static Bitmap ToBitmap(Texture t, int mipmap, string compressionType)
+    {
+      compressionType = compressionType.ToLower() == "default" ? predictCompressionType(t.HeaderData[0x70]) : compressionType;
+      var m = t.Mipmaps[mipmap];
+      var output = new Bitmap(m.Width, m.Height, PixelFormat.Format32bppArgb);
+      int[] imageData = new int[m.Width * m.Height];
+      byte[] ddfHeader = DDSHeader;
+      byte[] heightInBytes = convertIntToByteArray(m.Height);
+      byte[] widthInBytes = convertIntToByteArray(m.Width);
+      byte[] pitchInBytes = convertIntToByteArray(pitchCalculation(m.Width, compressionType));
+      byte[] compressionTypeInBytes = getHeaderCompressionType(compressionType);
+
+      Console.WriteLine(t.FileName);
+
+      for (var i = 0; i < 4; i++)
+      {
+        ddfHeader[heightHeaderOffset + i] = heightInBytes[i];
+        ddfHeader[widthHeaderOffset + i] = widthInBytes[i];
+        ddfHeader[pitchHeaderOffset + i] = pitchInBytes[i];
+        ddfHeader[compressionTypeOffset + i] = compressionTypeInBytes[i];
+      }
+
+      byte[] rawDataWithDDfHeader = new byte[ddfHeader.Length + m.Data.Length];
+      Buffer.BlockCopy(ddfHeader, 0, rawDataWithDDfHeader, 0, ddfHeader.Length);
+      Buffer.BlockCopy(m.Data, 0, rawDataWithDDfHeader, ddfHeader.Length, m.Data.Length);
+
+      if (m.Data.Length == (imageData.Length * 4))
+      {
+        // non compressed
+        Buffer.BlockCopy(m.Data, 0, imageData, 0, m.Data.Length);
+      }
+      else
+      {
+        // get current file path
+        string currentPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        string tempPath = Path.Combine(currentPath, "temp");
+        string tempMipmapFileName = t.FileName.Length > 0 ? t.FileName : "image.raw";
+
+        bool exists = System.IO.Directory.Exists(tempPath);
+        if(!exists)
+        {
+          System.IO.Directory.CreateDirectory(Path.Combine(tempPath));
+        }
+
+        // create a temp file of the biggest mipmap
+        using (BinaryWriter writer = new BinaryWriter(File.Create(Path.Combine(tempPath, tempMipmapFileName))))
+        {
+          writer.Write(rawDataWithDDfHeader);
+        }
+
+        // execute texconv.exe with the temp file
+        Console.WriteLine("-f " + compressionType + " -y -ft png -o temp " + Path.Combine("./temp", tempMipmapFileName));
+        Process process = Process.Start(Path.Combine(currentPath,"texconv.exe"), "-f " + compressionType +  " -y -ft png -o temp " + Path.Combine("./temp", tempMipmapFileName));
+        int id = process.Id;
+        Process tempProc = Process.GetProcessById(id);
+        tempProc.WaitForExit();
+
+        // read converted texture
+        Bitmap convertedTexture = new Bitmap(Path.Combine(tempPath, tempMipmapFileName.Replace(".bmp_ps4", "").Replace(".png_ps4", "") + ".png"));
+
+        return convertedTexture;
+      }
+
+      return output;
+
+    }
+
+    */
+
     // TODO: Decode DXT5 alpha channel
+
+   
     public static Bitmap ToBitmap(Texture t, int mipmap, string compressionType)
     {
       var m = t.Mipmaps[mipmap];
       var output = new Bitmap(m.Width, m.Height, PixelFormat.Format32bppArgb);
       int[] imageData = new int[m.Width * m.Height];
+
+      compressionType = compressionType.ToLower() == "default" ?  predictCompressionType(t.HeaderData[0x70]) : compressionType;
       if (m.Data.Length == (imageData.Length * 4))
       {
+        // non compressed
         Buffer.BlockCopy(m.Data, 0, imageData, 0, m.Data.Length);
-      } else if (compressionType.ToUpper() == "R8G8")
+      }  else if (compressionType.ToUpper() == "R8G8")
       {
         DecodeR8G8(m, imageData);
       } else if (compressionType.ToUpper() == "BC4")
@@ -43,18 +194,26 @@ namespace LibForge.Texture
       } else if (compressionType.ToUpper() == "BC5")
       {
         DecodeBC5(m, imageData);
-      } else if (compressionType.ToUpper() == "DXT" || compressionType.ToLower() == "default" || compressionType.ToUpper() == "BC3")
+      }  else if (compressionType.ToUpper() == "BC7")
+      {
+        DecodeBC7(m, imageData);
+      } else if (compressionType.ToUpper() == "DXT" ||  compressionType.ToUpper() == "BC3")
       {
         if (m.Data.Length == imageData.Length)
         {
-          DecodeDXT(m, imageData, true, compressionType);
+          DecodeDXT(m, imageData, true);
         }
         else if (m.Data.Length == (imageData.Length / 2))
         {
-          DecodeDXT(m, imageData, false, compressionType);
-        } else
+          DecodeDXT(m, imageData, false);
+        } else if (m.Data.Length == imageData.Length * 2)
         {
-          throw new Exception($"Don't know what to do with this texture (version={t.Version})... Hint: Try R8G8 compressionType");
+          DecodeR8G8(m, imageData);
+        }
+        else
+        {
+          Console.WriteLine($"Don't know what to do with this texture (version={t.Version})... Hint: Try R8G8 compressionType");
+          // throw new Exception($"Don't know what to do with this texture (version={t.Version})... Hint: Try R8G8 compressionType");
         }
       }
       else
@@ -68,6 +227,22 @@ namespace LibForge.Texture
         output.UnlockBits(data);
       }
       return output;
+    }
+
+    private static String predictCompressionType(int value)
+    {
+      if(value <= 34)
+      {
+        return "BC3";
+      } else if(value == 35)
+      {
+        return "BC4";
+      } else if (value == 37)
+      {
+        return "BC5";
+      }
+
+      return "BC3";
     }
 
     // (BC4 Block ATI1/3Dc+)
@@ -222,6 +397,56 @@ namespace LibForge.Texture
       }
     }
 
+
+/*
+    CMP_BTI bti_cpu[NUM_BLOCK_TYPES] = {
+    {NO_ALPHA,          4, 0, 0, 0, 12, TWO_PBIT, 3, {3, 0}},  // Format Mode 0
+    {NO_ALPHA,          6, 0, 0, 0, 18, ONE_PBIT, 2, {3, 0}},  // Format Mode 1
+    {NO_ALPHA,          6, 0, 0, 0, 15, NO_PBIT,  3, {2, 0}},  // Format Mode 2
+    {NO_ALPHA,          6, 0, 0, 0, 21, TWO_PBIT, 2, {2, 0}},  // Format Mode 3
+    {SEPARATE_ALPHA,    0, 2, 1, 6, 15, NO_PBIT,  1, {2, 3}},  // Format Mode 4
+    {SEPARATE_ALPHA,    0, 2, 0, 8, 21, NO_PBIT,  1, {2, 2}},  // Format Mode 5
+    {COMBINED_ALPHA,    0, 0, 0, 0, 28, TWO_PBIT, 1, {4, 0}},  // Format Mode 6
+    {COMBINED_ALPHA,    6, 0, 0, 0, 20, TWO_PBIT, 2, {2, 0}}   // Format Mode 7
+};
+*/
+
+    private static void DecodeBC7(Texture.Mipmap m, int[] imageData)
+    {
+      using (var s = new MemoryStream(m.Data))
+      {
+        for (var y = 0; y < m.Height; y += 4)
+        {
+          for (var x = 0; x < m.Width; x += 4)
+          {
+            int blockMode = 0;
+            byte readMode = s.ReadUInt8();
+
+            while(!IsBitSet(readMode, blockMode) && blockMode < 8)
+            {
+              blockMode++;
+            }
+
+            if(blockMode > 7)
+            {
+              throw new Exception("Something bad happened");
+            }
+            
+          }
+        }
+      }
+    }
+
+    private static bool IsBitSet(byte b, int pos)
+    {
+      return ((b >> pos) & 1) != 0;
+    }
+
+    public static int GetLSB(int intValue)
+    {
+      return (intValue & 0x0000FFFF);
+    }
+
     // seems like this is used for uncompressed normal maps
     // not sure about calculating blue
     private static void DecodeR8G8(Texture.Mipmap m, int[] imageData)
@@ -242,7 +467,7 @@ namespace LibForge.Texture
     }
 
 
-    private static void DecodeDXT(Texture.Mipmap m, int[] imageData, bool DXT5, string compressionType)
+    private static void DecodeDXT(Texture.Mipmap m, int[] imageData, bool DXT5)
     {
       int[] alpha = new int[16];
       int[] colors = new int[4];

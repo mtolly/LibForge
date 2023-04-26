@@ -18,5 +18,6 @@ namespace LibForge.Texture
     public Mipmap[] Mipmaps;
     public byte[] HeaderData;
     public byte[] FooterData;
+    public String FileName;
   }
 }
