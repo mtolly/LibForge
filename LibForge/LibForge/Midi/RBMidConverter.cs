@@ -182,7 +182,7 @@ namespace LibForge.Midi
       public RBMid ToRBMid()
       {
         rb = new RBMid();
-        var processedMidiTracks = ConvertVenueTrack(mf.Tracks);
+        var processedMidiTracks = ConvertVenueTrack(mf.Tracks, warnAction);
         ReadMidiFileResourceFromMidiFile(rb, mf, processedMidiTracks, MeasureTicks);
         rb.Format = 0x10;
 
@@ -1154,11 +1154,11 @@ namespace LibForge.Midi
           try { 
           if (e.Text[0] != '[')
           {
-            lyrics.Add(new RBMid.TICKTEXT
-            {
-              Text = e.Text.Trim(' '),
-              Tick = e.StartTicks,
-            });
+              lyrics.Add(new RBMid.TICKTEXT
+              {
+                Text = e.Text.Trim(' '),
+                Tick = e.StartTicks,
+              });
             return true;
           }
           return false;
@@ -1614,7 +1614,7 @@ namespace LibForge.Midi
       }
 
       // Converts the venue track from RBN2 to RBN1 so that RB4 can autogen animations
-      private static List<MidiTrack> ConvertVenueTrack(List<MidiTrack> tracks)
+      private static List<MidiTrack> ConvertVenueTrack(List<MidiTrack> tracks, Action<string> warnAction)
       {
         const int tpqn = 480;
         const int note_length = tpqn / 4; //16th note
@@ -1626,12 +1626,19 @@ namespace LibForge.Midi
         var venueTrack = tracks.Where(x => x.Name == "VENUE").FirstOrDefault();
         if (venueTrack == null)
         {
+          MidiTrack eventTrack = tracks.Where(x => x.Name == "EVENTS").FirstOrDefault();
+          foreach(var message in eventTrack.Messages)
+          {
+            warnAction(message.ToString());
+          }
+          warnAction?.Invoke("no venueTrack");
           return tracks;
         }
         if(!venueTrack.Messages.Any(m => m is TextEvent t 
             && (t.Text.Contains(".pp]") || t.Text.Contains("[coop") || t.Text.Contains("[directed"))))
         {
           // If this is already a RBN1 VENUE, skip it.
+          warnAction("Skipping, already a RBN1 Venue");
           return tracks;
         }
         long last_first = 0;
@@ -1648,6 +1655,7 @@ namespace LibForge.Midi
           {
             var index = mt.Text.IndexOf("[", StringComparison.Ordinal);
             var new_event = mt.Text.Substring(index, mt.Text.Length - index).Trim();
+            warnAction(new_event);
 
             if (new_event.Contains("[directed"))
             {

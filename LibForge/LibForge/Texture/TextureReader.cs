@@ -9,9 +9,11 @@ namespace LibForge.Texture
 {
   public class TextureReader : ReaderBase<Texture>
   {
-    public static Texture ReadStream(Stream s)
+    public static Texture ReadStream(Stream s, string fileName = "")
     {
-      return new TextureReader(s).Read();
+      var tr = new TextureReader(s).Read();
+      tr.FileName = fileName;
+      return tr;
     }
     public TextureReader(Stream s) : base(s) { }
 
@@ -23,7 +25,11 @@ namespace LibForge.Texture
         throw new Exception($"Unknown texture magic {magic}");
       }
       var version = Int();
-      var hdrData = magic == 6 ? FixedArr(Byte, version == 0xC ? 0x7Cu : 0xACu) : FixedArr(Byte, 0xA8);
+      long position = s.Position;
+      //Console.WriteLine(s.Position.ToString());
+      var hdrData = magic == 6 ? FixedArr(Byte, version == 0xC ? 0x7Cu : 0xACu) : FixedArr(Byte, 0xA4);
+      /* Console.WriteLine(s.Position.ToString());
+      Console.WriteLine("[{0}]", string.Join(", ", hdrData)); */
       var MipmapLevels = UInt();
       var Mipmaps = FixedArr(() => new Texture.Mipmap
       {
@@ -36,13 +42,20 @@ namespace LibForge.Texture
       {
         Mipmaps[i].Data = Arr(Byte);
       }
+      var numberOfPixels = Mipmaps[0].Width * Mipmaps[0].Height;
+      var dataLength = Mipmaps[0].Data.Length;
+      Console.WriteLine("[{0}]", string.Join(", ", hdrData));
+      float result = (float)numberOfPixels / (float)dataLength;
+      /* Console.WriteLine(numberOfPixels.ToString() + "px" + " - " + dataLength.ToString() + "byte "  + "result: " + result);
+      Console.WriteLine(version);
+      Console.WriteLine("---------------"); */
       var footerData = FixedArr(Byte, 0x1C);
       return new Texture
       {
         Version = magic,
         Mipmaps = Mipmaps,
         HeaderData = hdrData,
-        FooterData = footerData
+        FooterData = footerData,
       };
     }
   }
