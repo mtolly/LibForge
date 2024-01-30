@@ -205,7 +205,7 @@ SHORTNAMES
 
     public static DLCSong ConvertDLCSong(DataArray songDta, GameArchives.IDirectory songRoot, Action<string> warner, bool padVols = true)
     {
-      var path = songDta.Array("song").Array("name").String(1);
+      var path = songDta.Array("song").Array("name").Any(1);
       var hopoThreshold = songDta.Array("song").Array("hopo_threshold")?.Int(1) ?? 170;
       var shortname = path.Split('/').Last();
       var midPath = shortname + ".mid";
@@ -273,7 +273,7 @@ SHORTNAMES
         arr = dta.Array(i);
         dlcSongs.Add(ConvertDLCSong(
           arr,
-          dlcRoot.GetDirectory(arr.Array("song").Array("name").String(1).Split('/').Last()),
+          dlcRoot.GetDirectory(arr.Array("song").Array("name").Any(1).Split('/').Last()),
           warner,
           padVols));
       }

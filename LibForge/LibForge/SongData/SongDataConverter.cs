@@ -12,7 +12,7 @@ namespace LibForge.SongData
     {
       var songId = songDta.Array("song_id");
       var art = songDta.Array("album_art").Any(1);
-      var shortName = songDta.Array("song").Array("name").String(1).Split('/').Last();
+      var shortName = songDta.Array("song").Array("name").Any(1).Split('/').Last();
       var songIdNum = (shortName.GetHashCode() & 0xFFFFFF) + 90000000;
       return new SongData
       {
