@@ -182,7 +182,8 @@ namespace LibForge.Midi
       public RBMid ToRBMid()
       {
         rb = new RBMid();
-        var processedMidiTracks = ConvertVenueTrack(mf.Tracks);
+        var processedVenueTrack = ConvertVenueTrack(mf.Tracks);
+        var processedMidiTracks = ConvertEventsTrack(processedVenueTrack);
         ReadMidiFileResourceFromMidiFile(rb, mf, processedMidiTracks, MeasureTicks);
         rb.Format = 0x10;
 
@@ -1933,6 +1934,79 @@ namespace LibForge.Midi
         var tracks2 = new List<MidiTrack>(tracks);
         var venueIndex = tracks2.IndexOf(venueTrack);
         tracks2[venueIndex] = new MidiTrack(MidiHelper.ToRelative(absMessages.OrderBy(x => x.DeltaTime).ToList()), final_event + (note_length * 2), "VENUE");
+        return tracks2;
+      }
+
+      // LX: Make sure section names arent too long
+      private static List<MidiTrack> ConvertEventsTrack(List<MidiTrack> tracks)
+      {
+        const int tpqn = 480;
+        const int note_length = tpqn / 4; //16th note
+        var to_remove = new List<IMidiMessage>();
+        var to_add = new List<IMidiMessage>();
+        uint final_event = 0;
+
+        var eventsTrack = tracks.Where(x => x.Name == "EVENTS").FirstOrDefault();
+        if (eventsTrack == null)
+        {
+          return tracks;
+        }
+
+        var absMessages = MidiHelper.ToAbsolute(eventsTrack.Messages);
+        foreach (var message in absMessages)
+        {
+          final_event = message.DeltaTime;
+          if (message is MetaTextEvent mt && mt.Text.Contains("["))
+          {
+            var index = mt.Text.IndexOf("[", StringComparison.Ordinal);
+            var new_event = mt.Text.Substring(index, mt.Text.Length - index).Trim();
+
+            if (new_event.Contains("[prc_") && (new_event.Length > 36)) // if the text event's length is over 36, it will crash the game
+            {
+              new_event = new_event
+                .Remove(36, new_event.Length - 36) // cut off anything past the limit
+                .Insert(36, "]");
+              to_add.Add(new TextEvent(message.DeltaTime, new_event));
+              to_remove.Add(message);
+            }
+            else if (new_event.Contains("[section ") && (new_event.Length > 35) && (new_event.Length < 41))
+            {
+              new_event = new_event
+                .Replace("[section ", "[prc_"); // The crash is based on the total length of the text event, switch to "prc_" section to squeeze out a few more letters
+                //.Remove(36, new_event.Length - 36)
+                //.Insert(36, "]");
+              to_add.Add(new TextEvent(message.DeltaTime, new_event));
+              to_remove.Add(message);
+            }
+            else if (new_event.Contains("[section ") && (new_event.Length > 40))
+            {
+              new_event = new_event
+                .Remove(40, new_event.Length - 40) // If switching to "prc_" is still too long, cut off anything past the limit
+                .Insert(40, "]")
+                .Replace("[section ", "[prc_");
+              to_add.Add(new TextEvent(message.DeltaTime, new_event));
+              to_remove.Add(message);
+            }
+            else
+            {
+              continue;
+            }
+          }
+          else if (message is EndOfTrackEvent eot)
+          {
+            to_remove.Add(message);
+          }
+        }
+
+        foreach (var remove in to_remove)
+        {
+          absMessages.Remove(remove);
+        }
+        absMessages.AddRange(to_add);
+        absMessages.Add(new EndOfTrackEvent(final_event + (note_length * 2)));
+        var tracks2 = new List<MidiTrack>(tracks);
+        var eventsIndex = tracks2.IndexOf(eventsTrack);
+        tracks2[eventsIndex] = new MidiTrack(MidiHelper.ToRelative(absMessages.OrderBy(x => x.DeltaTime).ToList()), final_event + (note_length * 2), "EVENTS");
         return tracks2;
       }
     }
