@@ -1992,10 +1992,6 @@ namespace LibForge.Midi
               continue;
             }
           }
-          else if (message is EndOfTrackEvent eot)
-          {
-            to_remove.Add(message);
-          }
         }
 
         foreach (var remove in to_remove)
@@ -2003,10 +1999,9 @@ namespace LibForge.Midi
           absMessages.Remove(remove);
         }
         absMessages.AddRange(to_add);
-        absMessages.Add(new EndOfTrackEvent(final_event + (note_length * 2)));
         var tracks2 = new List<MidiTrack>(tracks);
         var eventsIndex = tracks2.IndexOf(eventsTrack);
-        tracks2[eventsIndex] = new MidiTrack(MidiHelper.ToRelative(absMessages.OrderBy(x => x.DeltaTime).ToList()), final_event + (note_length * 2), "EVENTS");
+        tracks2[eventsIndex] = new MidiTrack(MidiHelper.ToRelative(absMessages.OrderBy(x => x.DeltaTime).ToList()), final_event, "EVENTS");
         return tracks2;
       }
     }
