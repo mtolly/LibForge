@@ -58,10 +58,6 @@ namespace ForgeToolGUI.Inspectors
     {
       using (var con = STFSPackage.OpenFile(GameArchives.Util.LocalFile(filename)))
       {
-        if (con.Type != STFSType.CON)
-        {
-          throw new Exception($"File is not a CON file.");
-        }
         var datas = PkgCreator.GetSongMetadatas(con.RootDirectory.GetDirectory("songs"));
         if (datas.Count > 0)
         {
