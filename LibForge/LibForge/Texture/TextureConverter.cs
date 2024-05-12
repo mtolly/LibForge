@@ -48,6 +48,11 @@ namespace LibForge.Texture
         // xb1 texture with mipmaps embedded
         DecodeDXT(m, imageData, true, true);
       }
+      else if (m.Data.Length >= (imageData.Length / 2))
+      {
+        // xb1 texture with mipmaps embedded
+        DecodeDXT(m, imageData, false, true);
+      }
       else
       {
         throw new Exception($"Don't know what to do with this texture (version={t.Version}, length={m.Data.Length}, imageLength={imageData.Length})");
