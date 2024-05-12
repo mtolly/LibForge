@@ -12,6 +12,8 @@ namespace LibForge.Texture
       public int Width;
       public int Height;
       public int Flags;
+      public int DecompressedSize;
+      public int CompressionFlags;
       public byte[] Data;
     }
     public int Version;

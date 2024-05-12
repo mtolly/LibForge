@@ -43,9 +43,14 @@ namespace LibForge.Texture
       {
         DecodeDXT(m, imageData, false);
       }
+      else if (m.Data.Length >= imageData.Length)
+      {
+        // xb1 texture with mipmaps embedded
+        DecodeDXT(m, imageData, true, true);
+      }
       else
       {
-        throw new Exception($"Don't know what to do with this texture (version={t.Version})");
+        throw new Exception($"Don't know what to do with this texture (version={t.Version}, length={m.Data.Length}, imageLength={imageData.Length})");
       }
       // Copy data to bitmap
       {
@@ -56,7 +61,7 @@ namespace LibForge.Texture
       return output;
     }
 
-    private static void DecodeDXT(Texture.Mipmap m, int[] imageData, bool DXT5)
+    private static void DecodeDXT(Texture.Mipmap m, int[] imageData, bool DXT5, bool xboxswizzle = false)
     {
       int[] colors = new int[4];
       using (var s = new MemoryStream(m.Data))
@@ -66,7 +71,7 @@ namespace LibForge.Texture
         for (var y = 0; y < m.Height; y += 4)
           for (var x = 0; x < m.Width; x += 4)
           {
-            if (DXT5) s.Seek(8, SeekOrigin.Current);
+            if (DXT5) s.Seek(0x8, SeekOrigin.Current);
             ushort c0 = s.ReadUInt16LE();
             ushort c1 = s.ReadUInt16LE();
             colors[0] = RGB565ToARGB(c0);
@@ -94,12 +99,17 @@ namespace LibForge.Texture
               colors[3] = Color.Black.ToArgb();
             }
             var offset = y * m.Width + x;
+            if (xboxswizzle)
+            {
+              // Xbox texture swizzling offset: https://github.com/Free60Project/libxenon/blob/master/libxenon/drivers/console/console.c#L60
+              offset = (((y >> 5) * 32 * m.Width + ((x >> 5) << 10) +(x & 3) + ((y & 1) << 2) + (((x & 31) >> 2) << 3) + (((y & 31) >> 1) << 6)) ^ ((y & 8) << 2)) / 4;
+            }
             for (var i = 0; i < 4; i++)
             {
               for (var j = 0; j < 4; j++)
               {
                 var idx = (iData[i] >> (2 * j)) & 0x3;
-                imageData[offset + i * m.Width + j] = colors[idx];
+                imageData[offset + (i * m.Width) + j] = colors[idx];
               }
             }
           }

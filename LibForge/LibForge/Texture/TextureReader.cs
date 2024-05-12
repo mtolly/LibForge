@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using LibForge.Util;
+using System.IO.Compression;
 
 namespace LibForge.Texture
 {
@@ -29,12 +30,29 @@ namespace LibForge.Texture
       {
         Width = Int(),
         Height = Int(),
-        Flags = version == 0xC ? Int().Then(Skip(8)) : Int()
+        Flags = Int(),
+        DecompressedSize = version == 0xC ? Int() : 0,
+        CompressionFlags = version == 0xC ? Int() : 0,
       }, MipmapLevels);
       UInt();
       for(var i = 0; i < Mipmaps.Length; i++)
       {
         Mipmaps[i].Data = Arr(Byte);
+        // If there's a decompressed size we should zlib decompress the data
+        if (Mipmaps[i].DecompressedSize > 0)
+        {
+          byte[] decompressed = new byte[Mipmaps[i].DecompressedSize];
+          using (MemoryStream ms = new MemoryStream(Mipmaps[i].Data))
+          using (DeflateStream deflate = new DeflateStream(ms, CompressionMode.Decompress))
+          {
+            ms.Read(decompressed, 0, 2); // skip over zlib header
+            deflate.Read(decompressed, 0, Mipmaps[i].DecompressedSize);
+          }
+          Mipmaps[i].Data = decompressed;
+        }
+        // DDS textures (png_xb1/bmp_xb1) only have 1 blob of data for mipmaps
+        if (Mipmaps[i].CompressionFlags != 0)
+          break;
       }
       var footerData = FixedArr(Byte, 0x1C);
       return new Texture
