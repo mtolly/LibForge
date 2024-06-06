@@ -428,10 +428,22 @@ namespace LibForge.Midi
             return false;
           }
 
-          if (diff == 3 && rolls.Count > 0 && rolls[rolls.Count - 1].EndTick > e.StartTicks && lane != 0 /* MT: don't emit kick lanes */)
+          if (diff == 3 && rolls.Count > 0 && rolls[rolls.Count - 1].EndTick > e.StartTicks && lane != 0 /* don't emit kick lanes */)
           {
             var tmp = rolls[rolls.Count - 1];
-            tmp.Lanes |= 1 << lane;
+            // see if any more colors need to be added to this lane
+            int CurrentLaneCount = 0;
+            int n = tmp.Lanes;
+            // count set bits in tmp.Lanes (by MAK, https://stackoverflow.com/a/2709482)
+            while (n != 0)
+            {
+              n &= (n - 1);
+              CurrentLaneCount++;
+            }
+            if (CurrentLaneCount < tmp.MidiLaneCount)
+            {
+              tmp.Lanes |= 1 << lane;
+            }
             rolls[rolls.Count - 1] = tmp;
           }
           if (gem_tracks[diff] == null) gem_tracks[diff] = new List<RBMid.GEMTRACK.GEM>();
@@ -523,7 +535,8 @@ namespace LibForge.Midi
                 {
                   StartTick = e.StartTicks,
                   EndTick = e.StartTicks + e.LengthTicks,
-                  Lanes = 0
+                  Lanes = 0,
+                  MidiLaneCount = (e.Key == Roll1 ? 1 : 2)
                 });
               }
               else if (e.Key == 105 || e.Key == 106 || e.Key == 12 || e.Key == 13 || e.Key == 14 || e.Key == 15)
@@ -579,7 +592,7 @@ namespace LibForge.Midi
           {
             new RBMid.LANEMARKER.MARKER[0],
             new RBMid.LANEMARKER.MARKER[0],
-            new RBMid.LANEMARKER.MARKER[0],
+            new RBMid.LANEMARKER.MARKER[0], // TODO rb3 midi lanes can be applied to hard if velocity is low enough
             rolls.ToArray()
           }
         });

@@ -83,6 +83,8 @@ namespace LibForge.Midi
         public uint StartTick;
         public uint EndTick;
         public int Lanes;
+        // added to keep track of rb3 -> rb4 lane conversion
+        public int MidiLaneCount;
       }
       // First dimension: difficulty
       public MARKER[][] Markers;

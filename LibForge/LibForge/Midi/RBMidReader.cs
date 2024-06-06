@@ -130,7 +130,8 @@ namespace LibForge.Midi
       {
         StartTick = UInt(),
         EndTick = UInt(),
-        Lanes = Int()
+        Lanes = Int(),
+        MidiLaneCount = 0
       }))
     };
     private RBMid.GTRTRILLS ReadUnktrack2() => new RBMid.GTRTRILLS
