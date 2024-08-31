@@ -1380,6 +1380,10 @@ namespace LibForge.Midi
           }
         }
 
+        if(notes.Count <= 0)
+        {
+          return;
+        }
         var lastNote = notes.Last();
         var lastTempo = mf.TempoTimeSigMap.Last();
         var lastMeasure = MeasureTicks.Last() + (480U * lastTempo.Numerator * 4 / lastTempo.Denominator);
