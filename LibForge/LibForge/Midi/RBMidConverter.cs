@@ -1164,14 +1164,17 @@ namespace LibForge.Midi
         // Event handlers
         bool AddLyric(MidiText e)
         {
-          if (e.Text[0] != '[')
+          if (e.Text != "")
           {
-            lyrics.Add(new RBMid.TICKTEXT
+            if (e.Text[0] != '[')
             {
-              Text = e.Text.Trim(' '),
-              Tick = e.StartTicks,
-            });
-            return true;
+              lyrics.Add(new RBMid.TICKTEXT
+              {
+                Text = e.Text.Trim(' '),
+                Tick = e.StartTicks,
+              });
+              return true;
+            }
           }
           return false;
         }
@@ -1377,6 +1380,10 @@ namespace LibForge.Midi
           }
         }
 
+        if(notes.Count <= 0)
+        {
+          return;
+        }
         var lastNote = notes.Last();
         var lastTempo = mf.TempoTimeSigMap.Last();
         var lastMeasure = MeasureTicks.Last() + (480U * lastTempo.Numerator * 4 / lastTempo.Denominator);
