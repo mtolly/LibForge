@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,8 +12,20 @@ namespace LibForge.SongData
     {
       var songId = songDta.Array("song_id");
       var art = songDta.Array("album_art").Any(1);
+      string markup = songDta.Array("markup")?.Any(1) ?? string.Empty;
       var shortName = songDta.Array("song").Array("name").Any(1).Split('/').Last();
       var songIdNum = (shortName.GetHashCode() & 0xFFFFFF) + 90000000;
+      int solosValue = 0;
+      var soloArray = songDta.Array("solo");
+      if (soloArray != null)
+      {
+        var soloStr = soloArray.ToString();
+        if (soloStr.Contains("drum")) solosValue |= 1;
+        if (soloStr.Contains("guitar")) solosValue |= 2;
+        if (soloStr.Contains("bass")) solosValue |= 4;
+        if (soloStr.Contains("keys")) solosValue |= 32;
+      }
+
       return new SongData
       {
         AlbumArt = art == "1" || art == "TRUE",
@@ -30,10 +42,10 @@ namespace LibForge.SongData
         VocalsRank = songDta.Array("rank").Array("vocals").Int(1),
         Cover = false,
         Fake = false,
-        Flags = 0,
+        Solos = solosValue,
         GameOrigin = songDta.Array("game_origin")?.Any(1) ?? "ugc_plus",
         Genre = songDta.Array("genre").Symbol(1).ToString(),
-        HasFreestyleVocals = false,
+        HasMarkup = markup == "1" || markup == "TRUE",
         Medium = "",
         Name = songDta.Array("name").String(1),
         OriginalYear = songDta.Array("year_released").Int(1),

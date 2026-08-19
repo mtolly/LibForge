@@ -74,6 +74,21 @@ namespace LibForge.RBSong
         .Replace("sfx", "fusion/patches")
         .Replace("_bank.milo", ".fusion")
         ?? "fusion/patches/kit01.fusion";
+      var failsound = array.Array("band_fail_cue")?.Any(1)
+        .Replace(".cue", "")
+        ?? "band_fail_rock";
+      var animtempo = array.Array("anim_tempo")?.Any(1)
+        switch
+        {
+          "kTempoSlow" or "16" => "slow",
+          "kTempoMedium" or "32" => "medium",
+          "kTempoFast" or "64" => "fast",
+          _ => "medium" // in the case of unusual values ​​created by the community
+        };
+      var percussionBank = array.Array("bank")?.Any(1)
+        .Replace("sfx/", "fusion/patches/vox_perc_")
+        .Replace("_bank.milo", ".fusion")
+        ?? "fusion/patches/vox_perc_tambourine.fusion";
       var animations = ExtractVenuePropAnimsFromMidi(mf);
       return new RBSongResource
       {
@@ -105,12 +120,12 @@ namespace LibForge.RBSong
                       Unknown2 = 4,
                       Props = new[]
                       {
-                        new Property("tempo", new SymbolValue("medium")),
+                        new Property("tempo", new SymbolValue(animtempo)),
                         new Property("vocal_tonic_note", new LongValue(array.Array("vocal_tonic_note")?.Int(1) ?? 0)),
                         new Property("vocal_track_scroll_duration_ms", new LongValue(array.Array("song_scroll_speed")?.Int(1) ?? 2300)),
                         new Property("global_tuning_offset", new FloatValue(array.Array("tuning_offset_cents")?.Number(1) ?? 0)),
-                        new Property("band_fail_sound_event", new SymbolValue("")),
-                        new Property("vocal_percussion_patch", new ResourcePathValue("fusion/patches/vox_perc_tambourine.fusion")),
+                        new Property("band_fail_sound_event", new SymbolValue(failsound)),
+                        new Property("vocal_percussion_patch", new ResourcePathValue(percussionBank)),
                         new Property("drum_kit_patch", new ResourcePathValue(drumBank)),
                         new Property("improv_solo_patch", new SymbolValue("gtrsolo_amer_03")),
                         new Property("dynamic_drum_fill_override", new IntValue(10)),

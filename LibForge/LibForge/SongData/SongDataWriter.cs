@@ -39,10 +39,10 @@ namespace LibForge.SongData
       Write(r.Cover);
       Write(r.VocalGender);
       Write(r.Medium, 16);
-      Write(r.HasFreestyleVocals);
+      Write(r.HasMarkup);
       s.Position += 3;
       Write(r.VocalParts);
-      Write(r.Flags);
+      Write(r.Solos);
       Write(r.Fake);
       Write(r.Shortname, 256);
       s.WriteByte(0);

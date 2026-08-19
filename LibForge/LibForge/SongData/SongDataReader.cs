@@ -41,9 +41,9 @@ namespace LibForge.SongData
         Cover = Bool(),
         VocalGender = Byte(),
         Medium = String(16),
-        HasFreestyleVocals = Bool().Then(Skip(3)),
+        HasMarkup = Bool().Then(Skip(3)),
         VocalParts = Int(),
-        Flags = Int(),
+        Solos = Int(),
         Fake = Bool(),
         Shortname = String(256)
       };

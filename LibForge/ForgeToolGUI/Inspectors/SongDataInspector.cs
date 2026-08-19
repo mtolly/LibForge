@@ -43,7 +43,7 @@ namespace ForgeToolGUI
       vocalPartsTextBox.Text = data.VocalParts.ToString();
       vocalGenderTextBox.Text = data.VocalGender.ToString();
       mediumTextBox.Text = data.Medium;
-      freestyleCheckBox.Checked = data.HasFreestyleVocals;
+      freestyleCheckBox.Checked = data.HasMarkup;
       fakeCheckBox.Checked = data.Fake;
       shortnameTextBox.Text = data.Shortname;
     }

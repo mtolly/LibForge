@@ -436,7 +436,7 @@
       this.freestyleCheckBox.Name = "freestyleCheckBox";
       this.freestyleCheckBox.Size = new System.Drawing.Size(103, 17);
       this.freestyleCheckBox.TabIndex = 43;
-      this.freestyleCheckBox.Text = "Freestyle Vocals";
+      this.freestyleCheckBox.Text = "Markup";
       this.freestyleCheckBox.UseVisualStyleBackColor = true;
       // 
       // fakeCheckBox

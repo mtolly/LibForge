@@ -28,9 +28,9 @@
     public bool Cover;
     public byte VocalGender;
     public string Medium;
-    public bool HasFreestyleVocals;
+    public bool HasMarkup;
     public int VocalParts;
-    public int Flags;
+    public int Solos;
     public bool Fake;
     public string Shortname;
   }
