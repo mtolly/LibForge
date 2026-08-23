@@ -31,17 +31,17 @@ enum <byte> {
     Male = 1,
     Female = 2
 } vocal_gender;
-char anim_tempo[16];
+char anim_tempo[16]; // It isn't always there, and placing it here doesn't work. The game picks up the anim_tempo from the rbsong.
 char has_markup;
 FSeek(FTell()+3);
 int vocal_parts; // not certain about this one
 struct {
-    int unk_0 : 1;
-    int vocals : 1;
-    int unk_2 : 1;
-    int unk_3 : 1;
+    int drums : 1;
+    int guitar : 1; // This wasn't vocals, it's guitar
+    int bass : 1;
+    int unk_3 : 1; 
     int unk_4 : 1;
-    int unk_5 : 1;
+    int keys : 1; // Keys?? seen on Everybody Wants to Rule the World
 } solos;
 char fake;
 char shortname[256];
